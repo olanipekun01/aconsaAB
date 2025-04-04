@@ -1,0 +1,169 @@
+{% load static %}
+{% load custom_tags %}
+{% load custom_filters %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% block title %}ANCA{% endblock %}</title>
+  <link rel="stylesheet" href="{% static '/main.css' %}">
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style type="text/css">
+    .badge-success {
+      background-color: #10b981;
+      color: white;
+      padding: 0.25rem 0.5rem;
+      border-radius: 0.25rem;
+      font-size: 0.875rem;
+    }
+    .badge-success:hover {
+      background-color: #059669;
+    }
+
+    /* Menu button styling */
+    #xBar {
+      display: none;
+    }
+
+    /* Default state for mobile */
+    #navBar {
+      display: none;
+    }
+
+    /* Active state for mobile */
+    #navBar.active {
+      display: block;
+    }
+
+    #xBar.active {
+      display: block;
+    }
+
+    #menuBar.active {
+      display: none;
+    }
+
+    #navBar {
+      display: none;
+      transition: all 0.3s ease-in-out;
+    }
+
+    #menuBar, #xBar {
+      transition: all 0.3s ease-in-out;
+    }
+
+    /* Desktop view */
+    @media (min-width: 1024px) { /* lg: breakpoint */
+      #menuBar, #xBar {
+        display: none;
+      }
+      #navBar {
+        display: block;
+        position: static;
+      }
+    }
+
+    @media (max-width: 430px) { /* lg: breakpoint */
+      #navBar {
+        width: 100%;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+              0 2px 4px -1px rgba(0, 0, 0, 0.06);
+
+      }
+    }
+  </style>
+</head>
+<body class="min-h-screen bg-white">
+  <div class="flex flex-col md:flex-row">
+    <aside class="md:max-w-[256px] w-full bg-white md:border-r p-4">
+      <section class="flex flex-row justify-between items-center">
+        <div class="flex items-center gap-2">
+          <img src="{% static '/assets/achievers.png' %}" width="48" height="48" class="object-cover cursor-pointer" />
+          <h2 class="text-xl font-bold">University Portal</h2>
+        </div>
+        <div class="lg:hidden">
+          <img class="w-[40px]" id="menuBar" src="https://res.cloudinary.com/dztirmlfv/image/upload/v1738930587/bx-menu_ew07ve.svg" alt="Menu" />
+          <img class="w-[40px]" id="xBar" src="https://res.cloudinary.com/dztirmlfv/image/upload/v1738930587/bx-x_tfiznr.svg" alt="Close" />
+        </div>
+      </section>
+      <ul id="navBar" class="absolute z-20 md:relative mt-4 space-y-2 bg-white z-20">
+        <li><a href="/" class="flex items-center gap-2 p-2 hover:bg-gray-200 rounded">🏠 Home</a></li>
+        <li><a href="/courses" class="flex items-center gap-2 p-2 hover:bg-gray-200 rounded">📚 Courses</a></li>
+        <li><a href="/result/filter" class="flex items-center gap-2 p-2 hover:bg-gray-200 rounded">📅 Results</a></li>
+        <li><a href="/profile" class="flex items-center gap-2 p-2 hover:bg-gray-200 rounded">👩‍🎓 Profile</a></li>
+        <li><a href="/changepassword" class="flex items-center gap-2 p-2 hover:bg-gray-200 rounded">👩‍🎓 Profile</a></li>
+        <li class="lg:fixed lg:bottom-0">
+        <a href="/accounts/logout/" class="flex items-center gap-2 p-2 hover:bg-gray-200 rounded">📴 Logout</a>
+        </li>
+      </ul>
+
+      
+    </aside>
+
+    {% block content %}
+    <p>Welcome to My Django App!</p>
+    {% endblock %}
+  </div>
+
+  <footer class="bg-gray-900 text-white py-12">
+    <!-- Footer content remains the same -->
+    <div class="container mx-auto px-4">
+      <div class="grid md:grid-cols-3 gap-8">
+        <div>
+          <h3 class="text-lg font-semibold mb-4">Quick Links</h3>
+          <ul class="space-y-2">
+            <li><a href="/" class="hover:text-[#926868]">Home</a></li>
+            <li><a href="/courses" class="hover:text-[#926868]">Courses</a></li>
+            <li><a href="/result/filter/" class="hover:text-[#926868]">Result</a></li>
+            <li><a href="/profile" class="hover:text-[#926868]">Profile</a></li>
+            <li><a href="/accounts/changepassword/" class="hover:text-[#926868]">Change Password</a></li>
+          </ul>
+        </div>
+        <div>
+          <h3 class="text-lg font-semibold mb-4">Contact</h3>
+          <ul class="space-y-2">
+            <li>Email: </li>
+            <li>Phone: </li>
+            <li>KM2, OWO-ADO ROAD, IJAPO, Akure, Ondo State</li>
+          </ul>
+        </div>
+        <div>
+          <h3 class="text-lg font-semibold mb-4">Follow Us</h3>
+          <div class="flex space-x-4">
+            <a href="#" class="hover:text-[#926868]">Facebook</a>
+            <a href="#" class="hover:text-[#926868]">Twitter</a>
+            <a href="#" class="hover:text-[#926868]">LinkedIn</a>
+          </div>
+        </div>
+      </div>
+      <div class="border-t border-gray-800 mt-8 pt-8 text-center">
+        <p>© <span id="currentYear"></span> Achievers College Of Nursing Science Akure. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script type="text/javascript">
+    
+    document.getElementById("currentYear").innerText = new Date().getFullYear();
+    // Menu toggle functionality
+    const menuBar = document.getElementById('menuBar');
+    const navBar = document.getElementById('navBar');
+    const xRegular = document.getElementById('xBar');
+
+    menuBar.addEventListener("click", function() {
+      navBar.classList.toggle('active');
+      xRegular.classList.toggle('active');
+      menuBar.classList.toggle('active');
+    });
+
+    xRegular.addEventListener("click", function() {
+      navBar.classList.toggle('active');
+      xRegular.classList.toggle('active');
+      menuBar.classList.toggle('active');
+    });
+  </script>
+  {% block extra_scripts %}{% endblock %}
+</body>
+</html>

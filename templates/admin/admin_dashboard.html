@@ -1,0 +1,140 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="description" content="Get information about achievers on going addmission process for 2024/2025 admissions, check out programmes offered at Achievers University">
+    <Meta name="keywords" content="achievers university, achievers university owo, admissions, application, screening, post utme">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="achievers.png" type="image/x-icon"> 
+    <title>ACONSA</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style type="text/tailwindcss">
+    
+    </style>
+</head>
+<body>
+    <header class="relative flex justify-between item-center bg-gradient-to-r px-[20px] lg:px-[70px] py-6 from-[#077105] via-[#077105] to-[#049d04]">
+        <a href="/instructor/dashboard/" class="flex -gap-1 items-center -ml-2 lg:-ml-5">
+            <img src="{% static '/assets/achievers.png' %}" class="w-[40px] lg:w-20 " alt="">
+            <div class="text-[#fff]">
+                <h1 class="text-xl lg:text-3xl text-red font-bold ">ACONSA</h1>
+                <h5 class="text-sm lg:text-md">KM2, OWO-ADO ROAD, IJAPO, Akure, Ondo State</h5>
+            </div>
+        </a>
+
+        <div>
+            <div class="text-[12px] text-[#ffffff] flex flex-row gap-1">
+                <a class="border-r border-white border-solid px-2 hover:text-[#000000] hover:underline" href="./index.html">Home</a>
+                <a href="https://achieversnursingcollegeakure.edu.ng/" class="border-r border-white border-solid px-2 hover:text-[#000000] hover:underline">Official Website</a>
+                <span class="cursor-pointer hover:text-[#000000] hover:underline">Hot Line: </span>
+            </div>
+
+            <div class="mt-2">
+                <span class="text-[#caa16b] text-[20px] px-2">Undergraduate Portal</span>
+            </div>
+
+        </div>
+    </header>
+    <main>
+        <div class='bg-[#000000] text-white text-[17px] py-2 px-[10px] lg:px-[30px] flex flex-row justify-between'>
+            <div class>
+                <span>Student Control Center</span>
+            </div>
+
+            <div>
+                <span>Current Academic Session: {{sess}} ||</span>
+                <span>{{semes}} Semester  ||</span>
+                <a href="/accounts/logout">Logout</a>
+            </div>
+            
+        </div>
+        
+        <div class="flex flex-row gap-[10px]">
+            <div class="w-[250px] mt-[20px]">
+                <h3 class="bg-[#000000] text-white text-[17px] py-2 px-[10px] lg:px-[10px]">.: Control Menu</h3>
+                <div class="pt-4 px-2 flex flex-col gap-3">
+                    <div class="flex flex-row gap-2 align-center">
+                        <img src="{% static './assets/bxs-right-arrow.svg' %}" alt="">
+                        <a href="/instructor/dashboard/" class="px-3 bg-[#064b25] text-[#ffffff] py-2 w-[100%] text-[13px] hover:bg-[#ffffff] hover:border-solid hover:border-[#064b25] hover:border-[2px] hover:text-[#064b25]">Home</a>
+                    </div>
+
+                    <div class="flex flex-row gap-2 align-center">
+                        <img src="{% static './assets/bxs-right-arrow.svg' %}" alt="">
+                        <a href="/instructor/programmes/" class="px-3 bg-[#064b25] text-[#ffffff] py-2 w-[100%] text-[13px] hover:bg-[#ffffff] hover:border-solid hover:border-[#064b25] hover:border-[2px] hover:text-[#064b25]">Programs</a>
+                    </div>
+
+                    <div class="flex flex-row gap-2 align-center">
+                        <img src="{% static './assets/bxs-right-arrow.svg' %}" alt="">
+                        <a href="/instructor/departments/" class="px-3 bg-[#064b25] text-[#ffffff] py-2 w-[100%] text-[13px] hover:bg-[#ffffff] hover:border-solid hover:border-[#064b25] hover:border-[2px] hover:text-[#064b25]">Departments</a>
+                    </div>
+
+                    <div class="flex flex-row gap-2 align-center">
+                        <img src="{% static './assets/bxs-right-arrow.svg' %}" alt="">
+                        <a href="/instructor/courses/" class="px-3 bg-[#064b25] text-[#ffffff] py-2 w-[100%] text-[13px] hover:bg-[#ffffff] hover:border-solid hover:border-[#064b25] hover:border-[2px] hover:text-[#064b25]">Courses</a>
+                    </div>
+
+                    <div class="flex flex-row gap-2 align-center">
+                        <img src="{% static './assets/bxs-right-arrow.svg' %}" alt="">
+                        <a href="/instructor/student/management/" class="px-3 bg-[#064b25] text-[#ffffff] py-2 w-[100%] text-[13px] hover:bg-[#ffffff] hover:border-solid hover:border-[#064b25] hover:border-[2px] hover:text-[#064b25]">Registration</a>
+                    </div>
+
+                    <div class="flex flex-row gap-2 align-center">
+                        <img src="{% static './assets/bxs-right-arrow.svg' %}" alt="">
+                        <a href="/instructor/programmes/" class="px-3 bg-[#064b25] text-[#ffffff] py-2 w-[100%] text-[13px] hover:bg-[#ffffff] hover:border-solid hover:border-[#064b25] hover:border-[2px] hover:text-[#064b25]">Students</a>
+                    </div>
+
+                    <div class="flex flex-row gap-2 align-center">
+                        <img src="{% static './assets/bxs-right-arrow.svg' %}" alt="">
+                        <a href="/instructor/add_student/" class="px-3 bg-[#064b25] text-[#ffffff] py-2 w-[100%] text-[13px] hover:bg-[#ffffff] hover:border-solid hover:border-[#064b25] hover:border-[2px] hover:text-[#064b25]">Add Students</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class='w-[68%]'>
+                <div class='mt-[20px] bg-[#000000] text-white text-[17px] py-2 px-[10px] lg:px-[30px] flex flex-row gap-2'>
+                    <span class="uppercase">.: Dashboard </span>
+                    
+                </div>
+                <div class='mt-1 border-[1px] border-[#000] px-[30px] py-[10px]'>
+                    <div class="flex flex-row gap-8">
+                            <div class="w-[120px] flex flex-col gap-4 bg-[#000000] text-white rounded-lg px-4 py-3 items-center">
+                                <span class="">Programs</span>
+                                <span class="">{{countProgrammes}}</span>
+                            </div>
+
+                            <div class="w-[120px] flex flex-col gap-4 bg-[#000000] text-white rounded-lg px-4 py-3 items-center">
+                                <span class="">Level</span>
+                                <span class="">{{5}}</span>
+                            </div>
+
+                            <div class="w-[120px] flex flex-col gap-4 bg-[#000000] text-white rounded-lg px-4 py-3 items-center">
+                                <span class="">Courses</span>
+                                <span class="">{{countCourses}}</span>
+                            </div>
+
+                            {% comment %} <div class="w-[120px] flex flex-col gap-4 bg-[#000000] text-white rounded-lg px-4 py-3 items-center">
+                                <span class="">Student</span>
+                                <span class="">{{7}}</span>
+                            </div> {% endcomment %}
+                    </div>
+                    
+                    
+                </div>
+            </div>
+
+            <div class="mt-[20px]">
+                <div class='border-solid border-[#064b25] border-[2px] rounded-[20px]'>
+                    <img class='w-[90px] rounded-[20px]' src="{% static './assets/profile_pic.jpg' %}" alt="" />
+                </div>
+            </div>
+        
+        </div>
+
+        <footer class='mt-4 bg-[#077105] text-[#fff] text-[14px] py-4 text-center'>
+            Powered by Information & Communication Technology || Achievers University Owo &copy 2024, All Rights Reserved
+        </footer>
+    </main>
+</body>
+</html>

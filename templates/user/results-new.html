@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+    <div class="min-h-screen w-full p-6">
+    <div class="space-y-6">
+        <header class="flex items-center justify-between bg-white mb-6 p-4 border-b">
+            <h1 class="text-lg font-semibold">Results</h1>
+            <div class="flex items-center gap-4">
+                <span
+                    class="px-3 py-1 rounded text-white {% if student.student_status == 'inprogress' %} bg-yellow-500 {% elif student.student_status == 'failed' %} bg-red-500 {% elif student.student_status == 'graduated' %} bg-green-500 {% endif %}">
+                    {{ student.student_status|upper }}
+                </span>
+                <img
+                    src="{{ student.passport.url }}"
+                    alt="Student Photo"
+                    class="w-10 h-10 rounded-full hover:cursor-pointer" />
+            </div>
+        </header>
+        
+
+        <div class="bg-white shadow rounded-lg p-6 container mx-auto">
+            <h2 class="text-xl font-semibold">Select Session and Semester</h2>
+            <p class="text-sm text-gray-600">Choose the academic period to view results</p>
+
+            {% for message in messages %}
+                <h5 style="color: red">{{message}}</h5>
+            {% endfor %}
+
+            <form method="post" class="space-y-4">
+                {% csrf_token %}
+                <div class="space-y-2">
+                    <label for="session" class="block text-sm font-medium">Academic Session</label>
+                    <select id="session" name="session-select" class="w-full p-2 border rounded">
+                        <option value="">Select Academic Session</option>
+                        {% for sess in sessions %}
+                        <option value="{{sess.year}}">{{sess.year}} Academic Session</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="space-y-2">
+                    <label for="semester" class="block text-sm font-medium">Semester</label>
+                    <select id="semester" name="semester-select" class="w-full p-2 border rounded">
+                        <option value="">Select Semester</option>
+                        <option value="first">Harmattan Semester</option>
+                        <option value="second">Rain Semester</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="w-full bg-purple-700 text-white py-2 px-4 rounded-lg hover:bg-purple-800">View Result</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

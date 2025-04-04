@@ -1,0 +1,254 @@
+{% load static %}
+{% load custom_tags %}
+{% load custom_filters %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% block title %}ANCA{% endblock %}</title>
+  <link rel="stylesheet" href="{% static '/main.css' %}">
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style type="text/css">
+    .badge-success {
+      background-color: #10b981;
+      color: white;
+      padding: 0.25rem 0.5rem;
+      border-radius: 0.25rem;
+      font-size: 0.875rem;
+    }
+    .badge-success:hover {
+      background-color: #059669;
+    }
+
+    /* Menu button styling */
+    #xBar {
+      display: none;
+    }
+
+    /* Default state for mobile */
+    #navBar {
+      display: none;
+    }
+
+    /* Active state for mobile */
+    #navBar.active {
+      display: block;
+    }
+
+    #xBar.active {
+      display: block;
+    }
+
+    #menuBar.active {
+      display: none;
+    }
+
+    #navBar {
+      display: none;
+      transition: all 0.3s ease-in-out;
+    }
+
+    #menuBar, #xBar {
+      transition: all 0.3s ease-in-out;
+    }
+
+    /* Desktop view */
+    @media (min-width: 1024px) { /* lg: breakpoint */
+      #menuBar, #xBar {
+        display: none;
+      }
+      #navBar {
+        display: block;
+        position: static;
+      }
+    }
+
+    @media (max-width: 430px) { /* lg: breakpoint */
+      #navBar {
+        width: 100%;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+              0 2px 4px -1px rgba(0, 0, 0, 0.06);
+
+      }
+    }
+  </style>
+</head>
+<body class="min-h-screen bg-white">
+  <div class="flex flex-col md:flex-row">
+    <aside class="md:max-w-[256px] w-full bg-white md:border-r p-4">
+      <section class="flex flex-row justify-between items-center">
+        <div class="flex items-center gap-2">
+          <img src="{% static '/assets/achievers.png' %}" width="48" height="48" class="object-cover cursor-pointer" />
+          <h2 class="text-xl font-bold">University Portal</h2>
+        </div>
+        <div class="lg:hidden">
+          <img class="w-[40px]" id="menuBar" src="https://res.cloudinary.com/dztirmlfv/image/upload/v1738930587/bx-menu_ew07ve.svg" alt="Menu" />
+          <img class="w-[40px]" id="xBar" src="https://res.cloudinary.com/dztirmlfv/image/upload/v1738930587/bx-x_tfiznr.svg" alt="Close" />
+        </div>
+      </section>
+  
+
+      
+    </aside>
+    <main class="flex-1 p-6">
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <!-- Header -->
+            <div class="flex items-center justify-between">
+              <button href="{{semester}}/{{session}}" id="back-button" class="flex items-center gap-2 text-gray-700 hover:text-purple-700">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="15 18 9 12 15 6"></polyline>
+                </svg>
+                Back
+              </button>
+              <form action="/check/result/view/" method="post">
+                {% csrf_token %}
+                <input type="text" hidden value="{{matricNum}}" name="matricNum">
+                <input type="text" hidden value="{{semester}}" name="semes">
+                <input type="text" hidden value="{{session}}" name="sess">
+                <button class="bg-purple-700 text-white px-4 py-2 rounded-lg hover:bg-purple-800">Download Result</button>
+                </form>
+            </div>
+        
+            <!-- Title -->
+            <div class="mt-6">
+              <h1 class="text-2xl font-bold text-purple-700">Examination Result</h1>
+              <p class="text-gray-500">{{session}} Academic Session - {% if semester == 'first' %} Harmattan {% else %} Rain {% endif %} Semester</p>
+            </div>
+        
+            <!-- Summary Cards -->
+            <div class="grid gap-4 md:grid-cols-4 mt-6">
+              <div class="bg-gray-50 p-4 rounded-lg shadow-md">
+                <p class="text-sm font-medium text-gray-500">Total Courses</p>
+                <p id="total-courses" class="text-2xl font-bold">{{total_course}}</p>
+              </div>
+              <div class="bg-gray-50 p-4 rounded-lg shadow-md">
+                <p class="text-sm font-medium text-gray-500">Credit Units</p>
+                <p id="total-credits" class="text-2xl font-bold">{{total_credit_units}}</p>
+              </div>
+              <div class="bg-gray-50 p-4 rounded-lg shadow-md">
+                <p class="text-sm font-medium text-gray-500">Total Points</p>
+                <p id="total-points" class="text-2xl font-bold">{{total_points}}</p>
+              </div>
+              <div class="bg-gray-50 p-4 rounded-lg shadow-md">
+                <p class="text-sm font-medium text-gray-500">GPA</p>
+                <p id="gpa" class="text-2xl font-bold">{{gpa}}</p>
+              </div>
+            </div>
+        
+            <!-- Results Table -->
+            <div class="bg-gray-50 p-4 rounded-lg shadow-md mt-6">
+              <table class="w-full border-collapse border border-gray-300">
+                <thead class="bg-gray-100">
+                  <tr>
+                    <th class="border border-gray-300 px-4 py-2 text-left">Course Code</th>
+                    <th class="border border-gray-300 px-4 py-2 text-left">Course Title</th>
+                    <th class="border border-gray-300 px-4 py-2 text-left">Credit Unit</th>
+                    <th class="border border-gray-300 px-4 py-2 text-left">Grade</th>
+                    <th class="border border-gray-300 px-4 py-2 text-left">Grade Point</th>
+                    <th class="border border-gray-300 px-4 py-2 text-left">Total Point</th>
+                  </tr>
+                </thead>
+                <tbody id="results-body">
+                  <!-- Dynamic Rows -->
+                   {% for result in results %}
+                   <tr>
+                    <td class="border border-gray-300 px-4 py-2">{{result.registration.course.courseCode}}</td>
+                    <td class="border border-gray-300 px-4 py-2">{{result.registration.course.title}}</td>
+                    <td class="border border-gray-300 px-4 py-2">{{result.registration.course.unit}}</td>
+                    <td class="border border-gray-300 px-4 py-2">{{result.grade_type}}</td>
+                    <td class="border border-gray-300 px-4 py-2">{{result.grade_point}}</td>
+                    <td class="border border-gray-300 px-4 py-2">{{result.total_point}}</td>
+                   </tr>
+                   {% endfor %}
+                </tbody>
+              </table>
+            </div>
+        
+            <!-- Summary -->
+            <div class="bg-gray-50 p-4 rounded-lg shadow-md mt-6">
+              <div class="space-y-2">
+                <div class="flex justify-between">
+                  <span class="font-medium">Total Credit Units:</span>
+                  <span id="summary-total-credits">{{total_credit_units}}</span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="font-medium">Total Grade Points:</span>
+                  <span id="summary-total-points">{{total_points}}</span>
+                </div>
+                <div class="flex justify-between text-lg font-bold">
+                  <span>GPA:</span>
+                  <span id="summary-gpa">{{gpa}}</span>
+                </div>
+              </div>
+            </div>
+        </div>
+
+        
+        
+    </main>
+  </div>
+
+  <footer class="bg-gray-900 text-white py-12">
+    <!-- Footer content remains the same -->
+    <div class="container mx-auto px-4">
+      <div class="grid md:grid-cols-3 gap-8">
+        <div>
+          <h3 class="text-lg font-semibold mb-4">Quick Links</h3>
+          <ul class="space-y-2">
+            <li><a href="/" class="hover:text-[#926868]">Home</a></li>
+            <li><a href="/courses" class="hover:text-[#926868]">Courses</a></li>
+            <li><a href="/result/filter/" class="hover:text-[#926868]">Result</a></li>
+            <li><a href="/profile" class="hover:text-[#926868]">Profile</a></li>
+          </ul>
+        </div>
+        <div>
+          <h3 class="text-lg font-semibold mb-4">Contact</h3>
+          <ul class="space-y-2">
+            <li>Email: </li>
+            <li>Phone: </li>
+            <li>KM2, OWO-ADO ROAD, IJAPO, Akure, Ondo State</li>
+          </ul>
+        </div>
+        <div>
+          <h3 class="text-lg font-semibold mb-4">Follow Us</h3>
+          <div class="flex space-x-4">
+            <a href="#" class="hover:text-[#926868]">Facebook</a>
+            <a href="#" class="hover:text-[#926868]">Twitter</a>
+            <a href="#" class="hover:text-[#926868]">LinkedIn</a>
+          </div>
+        </div>
+      </div>
+      <div class="border-t border-gray-800 mt-8 pt-8 text-center">
+        <p>© <span id="currentYear"></span> Achievers College Of Nursing Science Akure. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script type="text/javascript">
+    
+    document.getElementById("currentYear").innerText = new Date().getFullYear();
+    // Menu toggle functionality
+    const menuBar = document.getElementById('menuBar');
+    const navBar = document.getElementById('navBar');
+    const xRegular = document.getElementById('xBar');
+
+    menuBar.addEventListener("click", function() {
+      navBar.classList.toggle('active');
+      xRegular.classList.toggle('active');
+      menuBar.classList.toggle('active');
+    });
+
+    xRegular.addEventListener("click", function() {
+      navBar.classList.toggle('active');
+      xRegular.classList.toggle('active');
+      menuBar.classList.toggle('active');
+    });
+  </script>
+{% block extra_scripts %}
+<script type="text/javascript" src="{% static 'js/resultview.js' %}"></script>
+{% endblock %}
+</body>
+</html>
+

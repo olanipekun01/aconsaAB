@@ -1,0 +1,103 @@
+{% extends 'base.html' %}
+{% load custom_tags %}
+{% load custom_filters %}
+
+
+{% load static %}
+
+{% block title %}Application - ANCA{% endblock %}
+
+{% block content %}
+
+  
+
+    <!-- Main Section -->
+    <main class="flex-1 p-6">
+        <div class="space-y-6">
+          <div class="bg-[#663399] text-white p-6 rounded-lg">
+            <h1 class="text-2xl font-semibold">Welcome Abe Otelo</h1>
+            <p class="text-sm">Tue Dec 31 2024</p>
+          </div>
+  
+          <!-- Card -->
+          <div class="border rounded-lg p-4 shadow-md">
+            <div class="mb-4">
+              <h2 class="text-2xl font-bold">View Result</h2>
+            </div>
+            {% for message in messages %}
+                <h5 style="color: red">{{message}}</h5>
+            {% endfor %}
+            <div class="space-y-4">
+            <form action="check/result/filter/" method="post">
+                {% csrf_token %}
+              <!-- Academic Session -->
+
+              <div>
+                
+                <input type="text" placeholder="au/27/nc/20000" name="matricNum" class="block w-full mt-2 rounded border-gray-300 p-2" />
+              </div>
+
+
+              <div>
+                <label class="text-sm font-medium">Academic Session</label>
+                <select id="session-select" name="session-select" class="block w-full mt-2 rounded border-gray-300 p-2">
+                  <option value="">Select Academic Session</option>
+                  {% for sess in sessions %}
+                  <option value="{{sess.year}}">{{sess.year}} Academic Session</option>
+                  {% endfor %}
+                </select>
+              </div>
+  
+              <!-- Semester -->
+              <div>
+                <label class="text-sm font-medium">Semester</label>
+                <select id="semester-select" name="semester-select" class="block w-full mt-2 rounded border-gray-300 p-2">
+                  <option value="">Select Semester</option>
+                  <option value="first">Harmattan Semester</option>
+                  <option value="second">Rain Semester</option>
+                </select>
+              </div>
+  
+              <!-- View Result Button -->
+              <button id="view-result-btn"
+                class="w-full bg-[#663399] text-white p-2 rounded hover:bg-purple-700 disabled:opacity-50">
+                View Result
+              </button>
+            </form>
+            </div>
+          </div>
+        </div>
+        <div class="mt-6 bg-white p-4 rounded shadow">
+          <h3 class="font-semibold">Quick Actions</h3>
+          <div class="grid md:grid-cols-4 gap-4 mt-4">
+                      <button onclick="location.href='/';" class="py-2 px-3 bg-transparent hover:bg-gray-100 duration-300 rounded border border-neutral-200">
+              Home
+            </button>
+                      <button onclick="location.href='/';" class="py-2 px-3 bg-transparent hover:bg-gray-100 duration-300 rounded border border-neutral-200">
+              Courses
+            </button>
+                      <button onclick="location.href='/result/filter';" class="py-2 px-3 bg-transparent hover:bg-gray-100 duration-300 rounded border border-neutral-200">
+  
+              🎓 Check Results
+            </button>
+                      <button onclick="location.href='/profile';" class="py-2 px-3 bg-transparent hover:bg-gray-100 duration-300 rounded border border-neutral-200">
+              Profile
+            </button>
+            <button class="py-2 px-3 bg-transparent hover:bg-gray-100 duration-300 rounded border border-neutral-200">
+              📅 View Timetable
+            </button>
+            
+            <button class="py-2 px-3 bg-transparent hover:bg-gray-100 duration-300 rounded border border-neutral-200">
+              💰 Pay Fees</button>
+            <button class="py-2 px-3 bg-transparent hover:bg-gray-100 duration-300 rounded border border-neutral-200">
+  
+              📢 View Announcements
+            </button>
+          </div>
+        </div>
+      </main>
+    {% endblock %}
+
+    {% block extra_scripts %}
+        <script type="text/javascript" src="{% static 'js/resultfilter.js' %}"></script>
+    {% endblock %}

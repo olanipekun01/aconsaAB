@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login Page</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="min-h-screen bg-gray-100 flex items-center justify-center">
+
+  <div class="w-full max-w-md bg-white rounded-lg shadow-md">
+    <div class="p-6">
+      <h2 class="text-2xl font-bold text-center">Login to Your Account</h2>
+      <p class="text-center text-gray-500">Enter your email and password to access your student portal</p>
+    </div>
+
+    {% for message in messages %}
+        <h5 style="color: red">{{message}}</h5>
+    {% endfor %}
+    <div class="p-6">
+      <form id="loginForm" class="space-y-4" method="POST" action="/accounts/login/">
+      {% csrf_token %}
+        <div class="space-y-2">
+          <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
+          <input 
+            id="email" 
+            type="text" 
+            name="email"
+            placeholder="m@example.com" 
+            class="w-full h-10 border border-gray-300 rounded-md px-3 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            required
+          />
+        </div>
+        <div class="space-y-2">
+          <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
+          <input 
+            id="password" 
+            type="password"
+            name="password"
+            class="w-full h-10 border border-gray-300 rounded-md px-3 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            required
+          />
+        </div>
+        <div id="errorAlert" class="hidden bg-red-50 text-red-600 p-3 rounded-md">
+          <p class="font-semibold">Error</p>
+          <p>Please enter both email and password</p>
+        </div>
+        <button 
+          type="submit"
+          class="w-full h-10 bg-indigo-600 text-white rounded-md font-medium hover:bg-indigo-700"
+        >
+          Log in
+        </button>
+      </form>
+    </div>
+    <div class="p-6 space-y-4">
+      <button class="text-sm text-indigo-600 hover:underline">Forgot password?</button>
+      <p class="text-sm text-center">
+        Don't have an account? 
+        <button class="text-indigo-600 hover:underline">Contact your administrator</button>
+      </p>
+    </div>
+  </div>
+
+
+  <script>
+    const loginForm = document.getElementById("loginForm");
+    const emailInput = document.getElementById("email");
+    const passwordInput = document.getElementById("password");
+    const errorAlert = document.getElementById("errorAlert");
+
+    loginForm.addEventListener("submit", (e) => {
+        //e.preventDefault();
+        const email = emailInput.value.trim();
+        const password = passwordInput.value.trim();
+        
+        if (!email || !password) {
+            errorAlert.classList.remove("hidden");
+        } else {
+            errorAlert.classList.add("hidden");
+            console.log("Login attempted with:", email, password);
+        }
+    }); 
+
+  </script>
+
+</body>
+</html>

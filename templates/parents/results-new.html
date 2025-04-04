@@ -1,0 +1,204 @@
+{% load static %}
+{% load custom_tags %}
+{% load custom_filters %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% block title %}ANCA{% endblock %}</title>
+  <link rel="stylesheet" href="{% static '/main.css' %}">
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style type="text/css">
+    .badge-success {
+      background-color: #10b981;
+      color: white;
+      padding: 0.25rem 0.5rem;
+      border-radius: 0.25rem;
+      font-size: 0.875rem;
+    }
+    .badge-success:hover {
+      background-color: #059669;
+    }
+
+    /* Menu button styling */
+    #xBar {
+      display: none;
+    }
+
+    /* Default state for mobile */
+    #navBar {
+      display: none;
+    }
+
+    /* Active state for mobile */
+    #navBar.active {
+      display: block;
+    }
+
+    #xBar.active {
+      display: block;
+    }
+
+    #menuBar.active {
+      display: none;
+    }
+
+    #navBar {
+      display: none;
+      transition: all 0.3s ease-in-out;
+    }
+
+    #menuBar, #xBar {
+      transition: all 0.3s ease-in-out;
+    }
+
+    /* Desktop view */
+    @media (min-width: 1024px) { /* lg: breakpoint */
+      #menuBar, #xBar {
+        display: none;
+      }
+      #navBar {
+        display: block;
+        position: static;
+      }
+    }
+
+    @media (max-width: 430px) { /* lg: breakpoint */
+      #navBar {
+        width: 100%;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+              0 2px 4px -1px rgba(0, 0, 0, 0.06);
+
+      }
+    }
+  </style>
+</head>
+<body class="min-h-screen bg-white">
+  <div class="flex flex-col md:flex-row">
+    <aside class="md:max-w-[256px] w-full bg-white md:border-r p-4">
+      <section class="flex flex-row justify-between items-center">
+        <div class="flex items-center gap-2">
+          <img src="{% static '/assets/achievers.png' %}" width="48" height="48" class="object-cover cursor-pointer" />
+          <h2 class="text-xl font-bold">University Portal</h2>
+        </div>
+        <div class="lg:hidden">
+          <img class="w-[40px]" id="menuBar" src="https://res.cloudinary.com/dztirmlfv/image/upload/v1738930587/bx-menu_ew07ve.svg" alt="Menu" />
+          <img class="w-[40px]" id="xBar" src="https://res.cloudinary.com/dztirmlfv/image/upload/v1738930587/bx-x_tfiznr.svg" alt="Close" />
+        </div>
+      </section>
+      
+
+      
+    </aside>
+
+    <div class="min-h-screen w-full p-6">
+    <div class="space-y-6">
+        <header class="flex items-center justify-between bg-white mb-6 p-4 border-b">
+            <h1 class="text-lg font-semibold">Results</h1>
+            
+        </header>
+        
+
+        <div class="bg-white shadow rounded-lg p-6 container mx-auto">
+            <h2 class="text-xl font-semibold">Select Session and Semester</h2>
+            <p class="text-sm text-gray-600">Choose the academic period to view results</p>
+
+            {% for message in messages %}
+                <h5 style="color: red">{{message}}</h5>
+            {% endfor %}
+
+            <form method="post" class="space-y-4">
+                {% csrf_token %}
+
+                <div class="space-y-2">
+                    <label for="session" class="block text-sm font-medium">Matric Number</label>
+                    <input type="text" placeholder="au/27/nc/20000" name="matricNum" class="block w-full mt-2 rounded border-gray-300 p-2" />
+                </div>
+
+                <div class="space-y-2">
+                    <label for="session" class="block text-sm font-medium">Academic Session</label>
+                    <select id="session" name="session-select" class="w-full p-2 border rounded">
+                        <option value="">Select Academic Session</option>
+                        {% for sess in sessions %}
+                        <option value="{{sess.year}}">{{sess.year}} Academic Session</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="space-y-2">
+                    <label for="semester" class="block text-sm font-medium">Semester</label>
+                    <select id="semester" name="semester-select" class="w-full p-2 border rounded">
+                        <option value="">Select Semester</option>
+                        <option value="first">First Semester</option>
+                        <option value="second">Second Semester</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="w-full bg-purple-700 text-white py-2 px-4 rounded-lg hover:bg-purple-800">View Result</button>
+            </form>
+        </div>
+    </div>
+</div>
+</div>
+
+<footer class="bg-gray-900 text-white py-12">
+  <!-- Footer content remains the same -->
+  <div class="container mx-auto px-4">
+    <div class="grid md:grid-cols-3 gap-8">
+      <div>
+        <h3 class="text-lg font-semibold mb-4">Quick Links</h3>
+        <ul class="space-y-2">
+          <li><a href="/" class="hover:text-[#926868]">Home</a></li>
+          <li><a href="/courses" class="hover:text-[#926868]">Courses</a></li>
+          <li><a href="/result/filter/" class="hover:text-[#926868]">Result</a></li>
+          <li><a href="/profile" class="hover:text-[#926868]">Profile</a></li>
+        </ul>
+      </div>
+      <div>
+        <h3 class="text-lg font-semibold mb-4">Contact</h3>
+        <ul class="space-y-2">
+          <li>Email: </li>
+          <li>Phone: </li>
+          <li>KM2, OWO-ADO ROAD, IJAPO, Akure, Ondo State</li>
+        </ul>
+      </div>
+      <div>
+        <h3 class="text-lg font-semibold mb-4">Follow Us</h3>
+        <div class="flex space-x-4">
+          <a href="#" class="hover:text-[#926868]">Facebook</a>
+          <a href="#" class="hover:text-[#926868]">Twitter</a>
+          <a href="#" class="hover:text-[#926868]">LinkedIn</a>
+        </div>
+      </div>
+    </div>
+    <div class="border-t border-gray-800 mt-8 pt-8 text-center">
+      <p>© <span id="currentYear"></span> Achievers College Of Nursing Science Akure. All rights reserved.</p>
+    </div>
+  </div>
+</footer>
+
+<script type="text/javascript">
+  
+  document.getElementById("currentYear").innerText = new Date().getFullYear();
+  // Menu toggle functionality
+  const menuBar = document.getElementById('menuBar');
+  const navBar = document.getElementById('navBar');
+  const xRegular = document.getElementById('xBar');
+
+  menuBar.addEventListener("click", function() {
+    navBar.classList.toggle('active');
+    xRegular.classList.toggle('active');
+    menuBar.classList.toggle('active');
+  });
+
+  xRegular.addEventListener("click", function() {
+    navBar.classList.toggle('active');
+    xRegular.classList.toggle('active');
+    menuBar.classList.toggle('active');
+  });
+</script>
+{% block extra_scripts %}{% endblock %}
+</body>
+</html>

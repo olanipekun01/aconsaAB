@@ -1,0 +1,141 @@
+{% extends 'base.html' %}
+{% load custom_tags %}
+{% load custom_filters %}
+
+
+{% load static %}
+
+{% block title %}Application - ANCA{% endblock %}
+
+{% block content %}
+
+  
+
+    <!-- Main Section -->
+    <main class="flex-1 p-6">
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <!-- Header -->
+            <div class="flex items-center justify-between">
+              <button href="{{semester}}/{{session}}" id="back-button" class="flex items-center gap-2 text-gray-700 hover:text-purple-700">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="15 18 9 12 15 6"></polyline>
+                </svg>
+                Back
+              </button>
+              <form action="/result/view/" method="post">
+                {% csrf_token %}
+                <input type="text" hidden value="{{semester}}" name="semes">
+                <input type="text" hidden value="{{session}}" name="sess">
+                <button class="bg-purple-700 text-white px-4 py-2 rounded-lg hover:bg-purple-800">Download Result</button>
+                </form>
+            </div>
+        
+            <!-- Title -->
+            <div class="mt-6">
+              <h1 class="text-2xl font-bold text-purple-700">Examination Result</h1>
+              <p class="text-gray-500">{{session}} Academic Session - {% if semester == 'first' %} Harmattan {% else %} Rain {% endif %} Semester</p>
+            </div>
+        
+            <!-- Summary Cards -->
+            <div class="grid gap-4 md:grid-cols-4 mt-6">
+              <div class="bg-gray-50 p-4 rounded-lg shadow-md">
+                <p class="text-sm font-medium text-gray-500">Total Courses</p>
+                <p id="total-courses" class="text-2xl font-bold">{{total_course}}</p>
+              </div>
+              <div class="bg-gray-50 p-4 rounded-lg shadow-md">
+                <p class="text-sm font-medium text-gray-500">Credit Units</p>
+                <p id="total-credits" class="text-2xl font-bold">{{total_credit_units}}</p>
+              </div>
+              <div class="bg-gray-50 p-4 rounded-lg shadow-md">
+                <p class="text-sm font-medium text-gray-500">Total Points</p>
+                <p id="total-points" class="text-2xl font-bold">{{total_points}}</p>
+              </div>
+              <div class="bg-gray-50 p-4 rounded-lg shadow-md">
+                <p class="text-sm font-medium text-gray-500">GPA</p>
+                <p id="gpa" class="text-2xl font-bold">{{gpa}}</p>
+              </div>
+            </div>
+        
+            <!-- Results Table -->
+            <div class="bg-gray-50 p-4 rounded-lg shadow-md mt-6">
+              <table class="w-full border-collapse border border-gray-300">
+                <thead class="bg-gray-100">
+                  <tr>
+                    <th class="border border-gray-300 px-4 py-2 text-left">Course Code</th>
+                    <th class="border border-gray-300 px-4 py-2 text-left">Course Title</th>
+                    <th class="border border-gray-300 px-4 py-2 text-left">Credit Unit</th>
+                    <th class="border border-gray-300 px-4 py-2 text-left">Grade</th>
+                    <th class="border border-gray-300 px-4 py-2 text-left">Grade Point</th>
+                    <th class="border border-gray-300 px-4 py-2 text-left">Total Point</th>
+                  </tr>
+                </thead>
+                <tbody id="results-body">
+                  <!-- Dynamic Rows -->
+                   {% for result in results %}
+                   <tr>
+                    <td class="border border-gray-300 px-4 py-2">{{result.registration.course.courseCode}}</td>
+                    <td class="border border-gray-300 px-4 py-2">{{result.registration.course.title}}</td>
+                    <td class="border border-gray-300 px-4 py-2">{{result.registration.course.unit}}</td>
+                    <td class="border border-gray-300 px-4 py-2">{{result.grade_type}}</td>
+                    <td class="border border-gray-300 px-4 py-2">{{result.grade_point}}</td>
+                    <td class="border border-gray-300 px-4 py-2">{{result.total_point}}</td>
+                   </tr>
+                   {% endfor %}
+                </tbody>
+              </table>
+            </div>
+        
+            <!-- Summary -->
+            <div class="bg-gray-50 p-4 rounded-lg shadow-md mt-6">
+              <div class="space-y-2">
+                <div class="flex justify-between">
+                  <span class="font-medium">Total Credit Units:</span>
+                  <span id="summary-total-credits">{{total_credit_units}}</span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="font-medium">Total Grade Points:</span>
+                  <span id="summary-total-points">{{total_points}}</span>
+                </div>
+                <div class="flex justify-between text-lg font-bold">
+                  <span>GPA:</span>
+                  <span id="summary-gpa">{{gpa}}</span>
+                </div>
+              </div>
+            </div>
+        </div>
+
+        <div class="mt-6 bg-white p-4 rounded shadow">
+          <h3 class="font-semibold">Quick Actions</h3>
+          <div class="grid md:grid-cols-4 gap-4 mt-4">
+                      <button onclick="location.href='/';" class="py-2 px-3 bg-transparent hover:bg-gray-100 duration-300 rounded border border-neutral-200">
+              Home
+            </button>
+                      <button onclick="location.href='/';" class="py-2 px-3 bg-transparent hover:bg-gray-100 duration-300 rounded border border-neutral-200">
+              Courses
+            </button>
+                      <button onclick="location.href='/result/filter';" class="py-2 px-3 bg-transparent hover:bg-gray-100 duration-300 rounded border border-neutral-200">
+  
+              🎓 Check Results
+            </button>
+                      <button onclick="location.href='/profile';" class="py-2 px-3 bg-transparent hover:bg-gray-100 duration-300 rounded border border-neutral-200">
+              Profile
+            </button>
+            <button class="py-2 px-3 bg-transparent hover:bg-gray-100 duration-300 rounded border border-neutral-200">
+              📅 View Timetable
+            </button>
+            
+            <button class="py-2 px-3 bg-transparent hover:bg-gray-100 duration-300 rounded border border-neutral-200">
+              💰 Pay Fees</button>
+            <button class="py-2 px-3 bg-transparent hover:bg-gray-100 duration-300 rounded border border-neutral-200">
+  
+              📢 View Announcements
+            </button>
+          </div>
+        </div>
+        
+    </main>
+{% endblock %}
+
+{% block extra_scripts %}
+    <script type="text/javascript" src="{% static 'js/resultview.js' %}"></script>
+{% endblock %}

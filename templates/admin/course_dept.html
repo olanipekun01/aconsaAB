@@ -1,0 +1,566 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="description" content="Get information about achievers on going addmission process for 2024/2025 admissions, check out programmes offered at Achievers University">
+    <Meta name="keywords" content="achievers university, achievers university owo, admissions, application, screening, post utme">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="achievers.png" type="image/x-icon">
+    <title>ACONSA</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style type="text/tailwindcss">
+        .create_programme, .update_programme {
+            background-color: #C3C4CE;
+            padding: 20px 20px;
+            width: 550px;
+            height: 900px;
+            border-radius: 20px;
+            display: none;
+            position: absolute;
+            top: 120px;
+            left: 520px;
+        }
+
+        
+
+        .create_programme form input, .update_programme form input {
+            /* width: 220px; */
+            width: 100%;
+            height: 50px;
+            border-radius: 25px;
+            border: none;
+            outline: none;
+            padding-left: 25px;
+            padding-right: 10px;
+            margin-bottom: 20px;
+        }
+
+        .create_programme form select, .update_programme form select {
+            width: 250px;
+            height: 30px;
+            border-radius: 25px;
+            border: none;
+            outline: none;
+            padding-left: 20px;
+            padding-right: 10px;
+            margin-bottom: 20px;
+        }
+
+        /* .create_programme form .checkbox_wrapper {} */
+
+        .create_programme form .checkbox_card, .update_programme form .checkbox_card {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .create_programme form label, .update_programme form label {
+            color: #545F7D;
+            /* padding: 12px 15px; */
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .create_programme form label.depts_checkbox,
+        .update_programme form label.depts_checkbox {
+            font-size: 23px;
+            /* margin-bottom: 20px; */
+        }
+
+        .create_programme form input.checkbx,
+        .update_programme form input.checkbx {
+            width: 15px;
+            height: 15px;
+            border-radius: 25px;
+            border: none;
+            margin: 0 0;
+        }
+
+        .create_programme form .checkbx_label, 
+        .update_programme form .checkbx_label {
+            margin-left: 10px;
+        }
+
+        .create_programme form button,
+        .update_programme form button {
+            font-size: 18px;
+            padding: 6px 0px;
+            width: 100%;
+            border-radius: 25px;
+            border: none;
+            margin-bottom: 20px;
+            color: white;
+            background: rgb(4, 134, 70);
+
+        }
+
+        .create_programme form button:hover,
+        .update_programme form button:hover {
+            color: rgb(4, 134, 70);
+            background: white;
+        }
+
+        .create_programme .cancel_btn,
+        .update_programme .cancel_btn {
+            font-size: 18px;
+            padding: 6px 0px;
+            width: 100%;
+            border-radius: 25px;
+            border: none;
+            margin-bottom: 20px;
+        }
+
+        .create_programme .cancel_btn:hover,
+        .update_programme .cancel_btn:hover {
+            font-weight: 700;
+            color: red;
+        }
+
+        .deletePopOut {
+            background-color: #C3C4CE;
+            padding: 20px 20px;
+            width: 350px;
+            border-radius: 20px;
+            display: none;
+            position: absolute;
+            top: 240px;
+            left: 520px;
+        }
+
+
+        .deletePopOut p {
+            color: #1E2875;
+            font-size: 19px;
+            font-weight: 800;
+        }
+
+        .deletePopOut .btn_wrapper {
+            display: flex;
+            width: 160px;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+        }
+
+        .deletePopOut .btn_wrapper button {
+            background: #1E2875;
+            color: white;
+            width: 70px;
+            font-size: 17px;
+            font-weight: 500;
+            padding: 10px 0;
+            border: none;
+            border-radius: 10px;
+        }
+
+        .deletePopOut .btn_wrapper button.danger {
+            background: red;
+        }
+
+        .deletePopOut .btn_wrapper button.danger a {
+            text-decoration: none;
+            color: white;
+        }
+
+        .deletePopOut .btn_wrapper button.danger:hover {
+            letter-spacing: 1.5px;
+            background: white;
+            color: red;
+        }
+
+        .deletePopOut .btn_wrapper button.danger:hover a {
+            color: red;
+        }
+
+        .deletePopOut .btn_wrapper button.cancel_btnPopOut:hover {
+            letter-spacing: 1.5px;
+            background: white;
+            color: #1E2875;
+        }
+
+        .background_wrapper {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 110%;
+            background: rgb(4, 134, 70, 0.5);
+            backdrop-filter: blur(5px);
+            display: none;
+        }
+
+    </style>
+</head>
+<body>
+    <!-- <script type="text/javascript">
+         const courses = JSON.parse('{{ courses|safe }}');
+        console.log("Courses data:", courses); 
+    </script> -->
+    
+    <header class="relative flex justify-between item-center bg-gradient-to-r px-[20px] lg:px-[70px] py-6 from-[#077105] via-[#077105] to-[#049d04]">
+        <a href="/instructor/dashboard/" class="flex -gap-1 items-center -ml-2 lg:-ml-5">
+            <img src="{% static '/assets/achievers.png' %}" class="w-[40px] lg:w-20 " alt="">
+            <div class="text-[#fff]">
+                <h1 class="text-xl lg:text-3xl text-red font-bold ">ACONSA</h1>
+                <h5 class="text-sm lg:text-md">KM2, OWO-ADO ROAD, IJAPO, Akure, Ondo State</h5>
+            </div>
+        </a>
+
+        <div>
+            <div class="text-[12px] text-[#ffffff] flex flex-row gap-1">
+                <a class="border-r border-white border-solid px-2 hover:text-[#000000] hover:underline" href="./index.html">Home</a>
+                <a href="https://achieversnursingcollegeakure.edu.ng/" class="border-r border-white border-solid px-2 hover:text-[#000000] hover:underline">Official Website</a>
+                <span class="cursor-pointer hover:text-[#000000] hover:underline">Hot Line: </span>
+            </div>
+
+            <div class="mt-2">
+                <span class="text-[#caa16b] text-[20px] px-2">Undergraduate Portal</span>
+            </div>
+
+        </div>
+    </header>
+    <main>
+        <div class='bg-[#000000] text-white text-[17px] py-2 px-[10px] lg:px-[30px] flex flex-row justify-between'>
+            <div class>
+                <span>Student Control Center</span>
+            </div>
+
+            <div>
+                <span>Current Academic Session: {{sess}} ||</span>
+                <span>{{semes}} Semester  ||</span>
+                <a href="/accounts/logout/">Logout</a>
+            </div>
+            
+        </div>
+        
+        <div class="flex flex-row gap-[10px]">
+            <div class="w-[250px] mt-[20px]">
+                <h3 class="bg-[#000000] text-white text-[17px] py-2 px-[10px] lg:px-[10px]">.: Control Menu</h3>
+                <div class="pt-4 px-2 flex flex-col gap-3">
+                    <div class="flex flex-row gap-2 align-center">
+                        <img src="{% static './assets/bxs-right-arrow.svg' %}" alt="">
+                        <a href="/instructor/dashboard/" class="px-3 bg-[#064b25] text-[#ffffff] py-2 w-[100%] text-[13px] hover:bg-[#ffffff] hover:border-solid hover:border-[#064b25] hover:border-[2px] hover:text-[#064b25]">Home</a>
+                    </div>
+
+                    <div class="flex flex-row gap-2 align-center">
+                        <img src="{% static './assets/bxs-right-arrow.svg' %}" alt="">
+                        <a href="/instructor/programmes/" class="px-3 bg-[#064b25] text-[#ffffff] py-2 w-[100%] text-[13px] hover:bg-[#ffffff] hover:border-solid hover:border-[#064b25] hover:border-[2px] hover:text-[#064b25]">Programs</a>
+                    </div>
+
+                    <div class="flex flex-row gap-2 align-center">
+                        <img src="{% static './assets/bxs-right-arrow.svg' %}" alt="">
+                        <a href="/instructor/departments/" class="px-3 bg-[#064b25] text-[#ffffff] py-2 w-[100%] text-[13px] hover:bg-[#ffffff] hover:border-solid hover:border-[#064b25] hover:border-[2px] hover:text-[#064b25]">Departments</a>
+                    </div>
+
+                    <div class="flex flex-row gap-2 align-center">
+                        <img src="{% static './assets/bxs-right-arrow.svg' %}" alt="">
+                        <a href="/instructor/courses/" class="px-3 bg-[#064b25] text-[#ffffff] py-2 w-[100%] text-[13px] hover:bg-[#ffffff] hover:border-solid hover:border-[#064b25] hover:border-[2px] hover:text-[#064b25]">Courses</a>
+                    </div>
+
+                    <div class="flex flex-row gap-2 align-center">
+                        <img src="{% static './assets/bxs-right-arrow.svg' %}" alt="">
+                        <a href="/instructor/student/management/" class="px-3 bg-[#064b25] text-[#ffffff] py-2 w-[100%] text-[13px] hover:bg-[#ffffff] hover:border-solid hover:border-[#064b25] hover:border-[2px] hover:text-[#064b25]">Registration</a>
+                    </div>
+
+                    <div class="flex flex-row gap-2 align-center">
+                        <img src="{% static './assets/bxs-right-arrow.svg' %}" alt="">
+                        <a href="/instructor/programmes/" class="px-3 bg-[#064b25] text-[#ffffff] py-2 w-[100%] text-[13px] hover:bg-[#ffffff] hover:border-solid hover:border-[#064b25] hover:border-[2px] hover:text-[#064b25]">Students</a>
+                    </div>
+
+                    <div class="flex flex-row gap-2 align-center">
+                        <img src="{% static './assets/bxs-right-arrow.svg' %}" alt="">
+                        <a href="/instructor/add_student/" class="px-3 bg-[#064b25] text-[#ffffff] py-2 w-[100%] text-[13px] hover:bg-[#ffffff] hover:border-solid hover:border-[#064b25] hover:border-[2px] hover:text-[#064b25]">Add Students</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class='w-[68%]'>
+                <div class='mt-[20px] bg-[#000000] flex flex-row justify-between  text-white text-[17px] py-2 px-[10px] lg:px-[30px] flex flex-row gap-2 items-center'>
+                    <span class="">.: {{department}} </span>
+
+                    <div class="features flex flex-row gap-8">
+                        <div class="">
+                            <img src="" alt="" class="">
+                            <button onclick="handleCreateModal()" class="">+ Create</button>
+                        </div>
+
+                        <div class="">
+                            <form action="" class="">
+                                <input type="text" class="">
+                                <button>Search</button>
+                            </form>
+                        </div>
+                    </div>
+
+                    
+                </div>
+
+                {% for message in messages %}
+                 <h5 style="color: red">{{message}}</h5>
+                {% endfor %}
+                <div class='mt-1 border-[1px] border-[#000] px-[30px] py-[10px]'>
+                    <div class="">
+                        <h4 class="text-[22px]">ALL DEPARTMENTS</h4>
+                    </div>
+
+                    <div class="mt-4 flex flex-col">
+
+                        
+
+                                
+                        
+                        <div class="flex flex-row gap-4 mt-5  border-y-[1px] border-[#000] px-[30px] py-[10px] overflow-x-scroll">
+
+                            
+
+                            {% for dept in depts %}
+                                <div class="card min-w-[140px] rounded-md border-[0.5px] border-[#077105] px-[5px] py-[10px]">
+                                    <div class="flex flex-row justify-between">
+                                        <a href="/instructor/courses/{{dept.id}}"><h5 class="font-bold text-[15px]">{{dept.name}}</h5></a>
+
+                                        
+                                    </div>
+                                    <p class="mt-3 text-[10px]"><span class="text-12px font-bold">Title: </span>{{dept.name}}</p>
+
+                                    
+                                </div>
+                            {% endfor %}
+
+
+                            
+
+                        
+
+
+                            
+                        </div>
+                            
+
+                        
+                    </div>
+                    
+                    
+                </div>
+            </div>
+
+            
+        
+        </div>
+    </main>
+
+    <footer class='mt-4 bg-[#077105] text-[#fff] text-[14px] py-4 text-center'>
+        Powered by Information & Communication Technology || Achievers University Owo &copy 2024, All Rights Reserved
+    </footer>
+
+    <div class="background_wrapper"></div>
+    
+
+
+    <div class="create_programme">
+        <form method="post" action="/instructor/courses/">
+          {% csrf_token %}
+
+          <h4 class="mb-8 text-[23px] ml-5 text-red-700">Create</h1>
+          <input
+            id="modalNameInput"
+            type="text"
+            name="course_title"
+            placeholder="Course Title"
+          />
+
+          <input
+            id="modalNameInput"
+            type="text"
+            name="course_code"
+            placeholder="Course Code"
+          />
+
+          <input
+            id="modalNameInput"
+            type="number"
+            name="course_unit"
+            placeholder="Course Unit"
+          />
+
+          <input
+            id="modalNameInput"
+            type="text"
+            name="course_status"
+            placeholder="Course Status, choose (C, E, R)"
+          />
+
+          <!-- <div class="flex flex-col mb-[60px] w-[100%] h-[300px] overflow-y-scroll"> -->
+            
+            
+            
+            <select name="programme" id="">
+                {% for prog in programme %}
+                <option value="{{prog.id}}" class="">{{prog.name}}</option>
+                {% endfor %}
+            </select>
+           
+
+
+
+          <!-- </div> -->
+
+          <div class="flex flex-col mb-[60px] w-[100%] h-[300px] overflow-y-scroll"> 
+            {% for p in programmes %}
+                <div class="flex flex-row">
+                    <input type="checkbox" data-unit="3" value="{{p.id}}" name="programmes" id="" class="course-checkbox">
+                         
+                    <label class="" for="">{{p.name}}</label>
+                </div>
+            {% endfor %}
+
+            
+
+
+          </div>
+
+
+          <select name="level" id="">
+            <option value="ND1" class="">ND1</option>
+            <option value="ND2" class="">ND2</option>
+            <option value="HND1" class="">HND1</option>
+            <option value="HND2" class="">HND2</option>
+          </select>
+
+          <select name="semester" id="">
+            <option value="first" class="">First Semester</option>
+            <option value="second" class="">Second Semester</option>
+          </select>
+
+
+          {% comment %} <input type="number" name="programme_duration" placeholder="duration" /> {% endcomment %}
+         
+  
+          
+          <button>submit</button>
+        </form>
+        <button
+          id="cancelNewStock"
+          class="cancel_btn"
+          onclick="closeCreateModal()"
+        >
+          cancel
+        </button>
+    </div>
+  
+
+    <div class="update_programme">
+        <form method="post" action="/instructor/courses/update/">
+          {% csrf_token %}
+
+          <h4 class="mb-8 text-[23px] ml-5 text-red-700">Update</h1>
+          <input
+            id="updateCourseTitleInput"
+            type="text"
+            name="course_title"
+            value="introduction to biochemistry"
+            placeholder="Course Title"
+          />
+
+          <input
+            id="updateCourseIdInput"
+            type="text"
+            name="course_id"
+            hidden
+            value="11111111"
+          />
+
+          <input
+            id="updateCourseCodeInput"
+            type="text"
+            name="course_code"
+            value="bch201"
+            placeholder="Course Code"
+          />
+
+          <input
+            id="updateCourseUnitInput"
+            type="number"
+            name="course_unit"
+            placeholder="Course Unit"
+            value="3"
+          />
+
+          <input
+            id="updateCourseStatusInput"
+            type="text"
+            name="course_status"
+            placeholder="Course Status, choose (C, E, R)"
+            value="C"
+          />
+
+          <div class="flex flex-col mb-[60px] w-[100%] h-[300px] overflow-y-scroll"> -->
+            {% for p in programmes %}
+                <div class="flex flex-row">
+                    <input type="checkbox" data-unit="3" value="{{p.id}}" name="programmes" id="" class="course-checkbox">
+                         
+                    <label class="" for="">{{p.name}}</label>
+                </div>
+            {% endfor %}
+
+            
+
+
+          </div>
+
+          <select name="programme" id="">
+            {% for prog in programme %}
+            <option value="{{prog.id}}" class="">{{prog.name}}</option>
+            {% endfor %}
+          </select>
+
+
+          <select name="level" id="updateCourseLevelInput">
+            <option value="ND1" class="">ND1</option>
+            <option value="ND2" class="">ND2</option>
+            <option value="HND1" class="">HND1</option>
+            <option value="HND2" class="">HND2</option>
+          </select>
+
+          <select name="semester" id="updateCourseSemesterInput">
+            <option value="first" class="">First Semester</option>
+            <option value="second" class="">Second Semester</option>
+          </select>
+
+  
+          
+          <button>submit</button>
+        </form>
+        <button
+          id="cancelNewStock"
+          class="cancel_btn"
+          onclick="closeCourseUpdateModal()"
+        >
+          cancel
+        </button>
+    </div>
+
+
+
+    <div class="deletePopOut">
+        <p>Are you sure you want to delete <span class="popOutItemName"></span>?</p>
+        <div class="btn_wrapper">
+          <button class="danger">
+            <a class="popOutItemLink" href="#">Yes</a>
+          </button>
+          <button id="cancelPopOut" class="cancel_btnPopOut" onclick="closePopOut()">
+            No
+        </button>
+        </div>
+      </div>
+
+
+    <script src="{% static 'js/admin_script.js' %}" type="text/javascript">
+
+        
+    </script>
+    
+</body>
+</html>

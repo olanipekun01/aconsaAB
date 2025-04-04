@@ -1,0 +1,14 @@
+@font-face {
+    font-family: 'GeistMono';
+    src: local('GeistMono'),
+         url('../static/fonts/GeistMono-VariableFont_wght.ttf') format("truetype");
+  }
+
+* {
+    font-family: 'GeistMono', monospace;
+    font-size: 16px;
+    line-height: 1.5;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}

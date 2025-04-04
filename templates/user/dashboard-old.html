@@ -1,0 +1,202 @@
+{% extends 'base.html' %}
+{% load custom_tags %}
+{% load custom_filters %}
+
+
+{% load static %}
+
+{% block title %}Application - COET{% endblock %}
+
+{% block content %}
+
+  
+
+    <!-- Main Section -->
+    <main class="flex-1 overflow-y-scroll p-4 bg-[#EAF0EC]">
+			<header class="pr-16">
+				<ul class="w-full flex flex-row justify-end gap-12 font-medium">
+					<li class="text-sm">Home</li>
+					<li class="text-sm">Official Website</li>
+					<li class="text-sm">Contact</li>
+				</ul>
+			</header>
+
+			<section class="mt-6 bg-[#2E032333] rounded-md py-3 w-full px-4">
+				<h1 class="text-4xl text-[#064B0D] font-bold">
+					PERSONAL INFORMATION
+				</h1>
+				<div class="mt-6 flex flex-row gap-6">
+					<img
+						src="{{student.passport.url}}"
+						class="w-[200px] rounded-full h-[200px] object-top object-cover object-center"
+						alt="User Photograph" />
+					<div class="grid grid-cols-2 gap-y-7 flex-1 font-light">
+						<fieldset>
+							<label for="name" class="font-medium text-[#064B0D]"
+								>NAME:</label
+							>
+							<!-- <p>OMATA DAVID ENYO-OJO</p> -->
+							<p>{{ student.surname }}, {{student.otherNames}}</p>
+						</fieldset>
+						<fieldset>
+							<label
+								class="font-medium text-[#064B0D]"
+								for="programme"
+								>PROGRAMME:</label
+							>
+							<p class="capitalize">{{student.programme}}</p>
+						</fieldset>
+						<fieldset>
+							<label
+								class="font-medium text-[#064B0D]"
+								for="matric_no"
+								>MATRIC NO / JAMB REG NO:</label
+							>
+							<p>AUO19EC2561</p>
+						</fieldset>
+						<fieldset>
+							<label
+								class="font-medium text-[#064B0D]"
+								for="programme_degree"
+								>PROGRAMME DEGREE:</label
+							>
+							<p class="capitalize">{{student.degree}}</p>
+						</fieldset>
+						<fieldset>
+							<label
+								class="font-medium text-[#064B0D]"
+								for="college"
+								>COLLEGE:</label
+							>
+							<p class="capitalize">{{student.college.name}}</p>
+						</fieldset>
+						<fieldset>
+							<label
+								class="font-medium text-[#064B0D]"
+								for="mode_of_entry"
+								>MODE OF ENTRY:</label
+							>
+							<p>{{student.modeOfEntry}}</p>
+						</fieldset>
+						<fieldset>
+							<label
+								class="font-medium text-[#064B0D]"
+								for="department"
+								>DEPARTMENT</label
+							>
+							<p class="capitalize">{{student.department.name}}</p>
+						</fieldset>
+						<fieldset>
+							<label
+								class="font-medium text-[#064B0D]"
+								for="entry_level"
+								>ENTRY LEVEL:</label
+							>
+							<p>{{student.entryLevel}}</p>
+						</fieldset>
+					</div>
+				</div>
+			</section>
+
+			<!-- <section> -->
+			<section
+				class="mt-8 bg-[#2E032333] font-light rounded-md py-16 px-4 w-full px-2">
+				<!-- <h1>ACADEMIC INFORMATION</h1> -->
+				<div class="grid-cols-3 grid gap-y-8">
+					<fieldset>
+						<label
+							class="font-medium text-[#064B0D]"
+							for="entry_year"
+							>ENTRY YEAR:</label
+						>
+						<p></p>
+					</fieldset>
+
+					<fieldset>
+						<label class="font-medium text-[#064B0D]" for="state"
+							>STATE:</label
+						>
+						<p>{{student.stateOfOrigin}}</p>
+					</fieldset>
+
+					<fieldset>
+						<label
+							class="font-medium text-[#064B0D]"
+							for="personal_email"
+							>PERSONAL EMAIL ADDRESS:</label
+						>
+						<p>{{student.studentEmail}}</p>
+					</fieldset>
+
+					<fieldset>
+						<label
+							class="font-medium text-[#064B0D]"
+							for="currenct_academic_level"
+							>CURRENT ACADEMIC LEVEL:</label
+						>
+						<p>{{student.currentLevel}}</p>
+					</fieldset>
+
+					<fieldset>
+						<label class="font-medium text-[#064B0D]" for="lga"
+							>LGA:</label
+						>
+						<p>{{student.localGovtArea}}</p>
+					</fieldset>
+
+					<fieldset>
+						<label
+							class="font-medium text-[#064B0D]"
+							for="school_email"
+							>SCHOOL EMAIL ADDRESS:</label
+						>
+						<p>{{student.studentEmail}}</p>
+					</fieldset>
+
+					<fieldset>
+						<label
+							class="font-medium text-[#064B0D]"
+							for="currenct_academic_year"
+							>CURRENT ACADEMIC YEAR:</label
+						>
+						<p>{{student.currentSession}}</p>
+					</fieldset>
+
+					<fieldset>
+						<label class="font-medium text-[#064B0D]" for="sex"
+							>SEX:</label
+						>
+						<p>MALE</p>
+					</fieldset>
+
+					<fieldset>
+						<label class="font-medium text-[#064B0D]" for="dob"
+							>DATE OF BIRTH:</label
+						>
+						<p>{{student.dateOfBirth}}</p>
+					</fieldset>
+
+					<fieldset>
+						<label class="font-medium text-[#064B0D]" for="phone"
+							>PHONE NO:</label
+						>
+						<p>{{student.studentPhoneNumber}}</p>
+					</fieldset>
+
+					<fieldset>
+						<label
+							class="font-medium text-[#064B0D]"
+							for="guardian_phone"
+							>GUARDIAN PHONE NO:</label
+						>
+						<p>+234 905 940 1192</p>
+					</fieldset>
+				</div>
+			</section>
+		</main>
+    
+{% endblock %}
+
+{% block extra_scripts %}
+    <script type="text/javascript" src="{% static 'js/dashboard.js' %}"></script>
+{% endblock %}

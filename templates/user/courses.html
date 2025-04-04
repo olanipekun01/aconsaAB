@@ -1,0 +1,258 @@
+{% extends 'base.html' %}
+{% load custom_tags %}
+{% load custom_filters %}
+
+
+{% load static %}
+
+{% block title %}Application - ANCA{% endblock %}
+
+{% block content %}
+
+  
+
+    <!-- Main Section -->
+    <main class="flex-1 p-6">
+   
+      <div class="space-y-6">
+        <!-- Welcome Message -->
+        <header class="flex items-center justify-between bg-white mb-6 p-4 border-b">
+          <h1 class="text-lg font-semibold">Course Registration</h1>
+          <div class="flex items-center gap-4">
+              <span
+                  class="px-3 py-1 rounded text-white {% if student.student_status == 'inprogress' %} bg-yellow-500 {% elif student.student_status == 'failed' %} bg-red-500 {% elif student.student_status == 'graduated' %} bg-green-500 {% endif %}">
+                  {{ student.student_status|upper }}
+              </span>
+              <img
+                  src="{{ student.passport.url }}"
+                  alt="Student Photo"
+                  class="w-10 h-10 rounded-full hover:cursor-pointer" />
+          </div>
+      </header>
+
+        {% for message in messages %}
+            <h5 style="color: red">{{message}}</h5>
+        {% endfor %}
+
+        <!-- Harmattan Semester -->
+        <section class="space-y-4">
+          <h2 class="text-xl font-semibold mb-4">
+            {% if semes.name == 'first' %}
+            First Semester
+            {% else %}
+            Second Semester
+            {% endif %}
+          </h2>
+          <div class="bg-[#6A32A1] text-white p-4 mb-4 flex flex-row justify-between rounded-md shadow">
+            <h3 class="text-lg font-semibold">My Prescribed Courses</h3>
+
+            <span id="totalUnits">0</span>
+          </div>
+          <form class='flex flex-col gap-4' method='post' action='/courses/'>
+            {% csrf_token %}
+            <p id="warning" style="color: red; display: none;">You have exceeded the maximum allowed units!</p>
+            <table class="min-w-full border-collapse border border-gray-200">
+              <thead>
+                <tr>
+                  <th class="border border-gray-200 p-2">Check</th>
+                  <th class="border border-gray-200 p-2">Course Code</th>
+                  <th class="border border-gray-200 p-2">Course Name</th>
+                  <th class="border border-gray-200 p-2">Credit Units</th>
+                  <th class="border border-gray-200 p-2">Semester</th>
+                  <th class="border border-gray-200 p-2">Course Status</th>
+                  {% comment %} <th class="border border-gray-200 p-2">Options</th> {% endcomment %}
+                </tr>
+              </thead>
+              <tbody>
+                  <input type="hidden" name="sess" value="{{ sess }}">
+                  <input type="hidden" name="semes" value="{{ semes }}">
+                  <input type="text" id="inputTotalUnits" name="totalUnit" value="{{ semes }} ">
+                  {% if carryover %}
+                    {% for co in carryover %}
+                      <tr>
+                        <td class='tbodytrtd '><input type="hidden" name="courses" value="{{ co.course.id }}"/><input type="checkbox" checked disabled data-unit="3" name='courses' value="{{course.id}}" class="course-checkbox"/></td>
+                        <td class="border border-gray-200 p-2">{{co.course.courseCode}}</td>
+                        <td class="border border-gray-200 p-2">{{co.course.title}}</td>
+                        <td class="border border-gray-200 p-2">{{co.course.unit}}</td>
+                        <td class="border border-gray-200 p-2">{{semes}} Semester</td>
+                        <td class="border border-gray-200 p-2">C</td>
+                      </tr>
+                    {% endfor %}
+                  {% endif %}
+                {% for course in courses %}
+                <tr>
+                  <td class='tbodytrtd '><input type="checkbox" data-unit="3" name='courses' value="{{course.id}}" class="course-checkbox"/></td>
+                  <td class="border border-gray-200 p-2">{{course.courseCode}}</td>
+                  <td class="border border-gray-200 p-2">{{course.title}}</td>
+                  <td class="border border-gray-200 p-2">{{course.unit}}</td>
+                  <td class="border border-gray-200 p-2">{{semes}} Semester</td>
+                  <td class="border border-gray-200 p-2">{{course.status}}</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+            
+
+            <button class='hover:bg-neutral-100 text-[#6A32A1] px-[15px] py-[10px] bg-transparent border border-neutral-300 hover:border-[#6A32A1] duration-300 rounded-md shadow'>Submit</button>
+        
+        </form>
+        </section>
+
+       
+      </div>
+
+    
+    
+    {% if duration %}
+       {% for i in duration|custom_range %}
+      <div class="bg-[#6A32A1] text-white p-4 mb-4 mt-8">
+        <h3 class="text-lg font-semibold">{{ unique_sessions|get_item:i }} Academic Session Credit Units: {15} </h3>
+      </div>
+      <div class="rounded-md border mt-4 bg-white shadow-sm">
+        <div class="p-4 text-center">
+          <h3 class="text-lg font-semibold">First Semester</h3>
+        </div>
+
+        <!-- Table -->
+        <div class="overflow-x-auto">
+          <form class='flex flex-col gap-4' method='post' action='/print'>
+          {% csrf_token %}
+          <table class="w-full table-auto border-collapse border border-gray-200">
+            <!-- Table Header -->
+            <thead class="bg-gray-100">
+              <tr>
+                <th class="border p-2 text-left">Course Code</th>
+                <th class="border p-2 text-left">Course Title</th>
+                <th class="border p-2 text-left">Credit Unit</th>
+                <th class="border p-2 text-left">Semester</th>
+                <th class="border p-2 text-left">Course Status</th>
+                <th class="border p-2 text-left">Approval Status</th>
+                <th class="border p-2 text-left">Options</th>
+              </tr>
+            </thead>
+            <!-- Table Body -->
+            <tbody id="table-body">
+              <!-- Dynamic rows will be inserted here -->
+              {% for data in sessions_and_levels %}
+                  {% if  data.level == unique_levels|get_item:i and data.registration.course.semester.name == 'first' %}
+                  <tr>
+                    <td class="border p-2 text-left">{{data.registration.course.courseCode}}</td>
+                    <td class="border p-2 text-left">{{data.registration.course.title}}</td>
+                    <td class="border p-2 text-left">{{data.registration.course.unit}}</td>
+                    <td class="border p-2 text-left">{{data.registration.course.semester.name}}</td>
+                    <td class="border p-2 text-left">{{data.registration.course.status}}</td>
+                    <td class="border p-2 text-left">{{data.registration.instructor_remark}}</td>
+                    {% if data.registration.instructor_remark == 'rejected' %}
+                    <td class="border p-2 text-left"><a href="/course/delete/{{data.registration.id}}" class="text-red-700 underline">del</a></td>
+                    {% else %}
+                    <td class="border p-2 text-left"></td>
+                    {% endif %}
+                  </tr>
+                {% endif %}
+            {% endfor %}
+
+            </tbody>
+          </table>
+          <input type="hidden" name="sess" value="{{ unique_sessions|get_item:i }}">
+            <input type="hidden" name="semes" value="first">
+
+            {% comment %} <p id="warning" style="color: red; display: none;">You have exceeded the maximum allowed units!</p> {% endcomment %}
+
+            <button class='bg-[#077105] text-[#fff] px-[15px] py-[10px] hover:bg-[#fff] hover:text-[#077105] hover:border-[1px] hover:border-[#077105]'>Print</button>
+        </form>
+        </div>
+
+        <div class="p-4 text-center">
+          <h3 class="text-lg font-semibold">Second Semester</h3>
+        </div>
+
+      <!-- Table -->
+        <div class="overflow-x-auto">
+          <form class='flex flex-col gap-4' method='post' action='/print'>
+          {% csrf_token %}
+          <table class="w-full table-auto border-collapse border border-gray-200">
+            <!-- Table Header -->
+            <thead class="bg-gray-100">
+              <tr>
+                <th class="border p-2 text-left">Course Code</th>
+                <th class="border p-2 text-left">Course Title</th>
+                <th class="border p-2 text-left">Credit Unit</th>
+                <th class="border p-2 text-left">Semester</th>
+                <th class="border p-2 text-left">Course Status</th>
+                <th class="border p-2 text-left">Approval Status</th>
+                <th class="border p-2 text-left">Options</th>
+              </tr>
+            </thead>
+            <!-- Table Body -->
+            <tbody id="table-body">
+              <!-- Dynamic rows will be inserted here -->
+              {% for data in sessions_and_levels %}
+                  {% if  data.level == unique_levels|get_item:i and data.registration.course.semester.name == 'second' %}
+                  <tr>
+                    <td class="border p-2 text-left">{{data.registration.course.courseCode}}</td>
+                    <td class="border p-2 text-left">{{data.registration.course.title}}</td>
+                    <td class="border p-2 text-left">{{data.registration.course.unit}}</td>
+                    <td class="border p-2 text-left">{{data.registration.course.semester.name}}</td>
+                    <td class="border p-2 text-left">{{data.registration.course.status}}</td>
+                    <td class="border p-2 text-left">{{data.registration.instructor_remark}}</td>
+                    {% if data.registration.instructor_remark == 'rejected' %}
+                    <td class="border p-2 text-left"><a href="http://">del</a></td>
+                    {% else %}
+                    <td class="border p-2 text-left"></td>
+                    {% endif %}
+                  </tr>
+                {% endif %}
+              {% endfor %}
+
+            </tbody>
+            
+          </table>
+            <input type="hidden" name="sess" value="{{ unique_sessions|get_item:i }}">
+            <input type="hidden" name="semes" value="second">
+
+            {% comment %} <p id="warning" style="color: red; display: none;">You have exceeded the maximum allowed units!</p> {% endcomment %}
+
+            <button class='bg-[#077105] text-[#fff] px-[15px] py-[10px] hover:bg-[#fff] hover:text-[#077105] hover:border-[1px] hover:border-[#077105]'>Print</button>
+        </form>
+
+        </div>
+      </div>
+      <hr class="mt-4">
+      {% endfor %}
+    {% endif %}
+
+    <div class="mt-6 bg-white p-4 rounded shadow">
+      <h3 class="font-semibold">Quick Actions</h3>
+      <div class="grid md:grid-cols-4 gap-4 mt-4">
+                  <button onclick="location.href='/';" class="py-2 px-3 bg-transparent hover:bg-gray-100 duration-300 rounded border border-neutral-200">
+          Home
+        </button>
+                  <button onclick="location.href='/';" class="py-2 px-3 bg-transparent hover:bg-gray-100 duration-300 rounded border border-neutral-200">
+          Courses
+        </button>
+                  <button onclick="location.href='/result/filter';" class="py-2 px-3 bg-transparent hover:bg-gray-100 duration-300 rounded border border-neutral-200">
+
+          🎓 Check Results
+        </button>
+                  <button onclick="location.href='/profile';" class="py-2 px-3 bg-transparent hover:bg-gray-100 duration-300 rounded border border-neutral-200">
+          Profile
+        </button>
+        <button class="py-2 px-3 bg-transparent hover:bg-gray-100 duration-300 rounded border border-neutral-200">
+          📅 View Timetable
+        </button>
+        
+        <button class="py-2 px-3 bg-transparent hover:bg-gray-100 duration-300 rounded border border-neutral-200">
+          💰 Pay Fees</button>
+        <button class="py-2 px-3 bg-transparent hover:bg-gray-100 duration-300 rounded border border-neutral-200">
+
+          📢 View Announcements
+        </button>
+      </div>
+    </div>
+    
+    </main>
+    {% endblock %}
+
+    {% block extra_scripts %}
+        <script type="text/javascript" src="{% static 'js/courses.js' %}"></script>
+    {% endblock %}

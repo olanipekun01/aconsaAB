@@ -1,0 +1,242 @@
+{% extends 'base.html' %} {% load custom_tags %} 
+{% load custom_filters %} 
+{% load static %} 
+{% block title %}Application - ANCA{% endblock %} 
+
+{% block content %}
+
+<div class="flex min-h-screen w-full">
+
+	<!-- Main Content -->
+	<div class="flex-1 flex p-6 flex-col">
+		
+		
+		
+		
+		
+		<!-- Header -->
+		<header class="flex items-center justify-between bg-white p-4 mb-6 border-b">
+			<h1 class="text-lg font-semibold">Student Dashboard</h1>
+			<div class="flex items-center gap-4">
+				<span
+					class="px-3 py-1 rounded text-white {% if student.student_status == 'inprogress' %} bg-yellow-500 {% elif student.student_status == 'failed' %} bg-red-500 {% elif student.student_status == 'graduated' %} bg-green-500 {% endif %}">
+					{{ student.student_status|upper }}
+				</span>
+				<img
+					src="{{ student.passport.url }}"
+					alt="Student Photo"
+					class="w-10 h-10 rounded-full hover:cursor-pointer" />
+			</div>
+		</header>
+
+		<!-- Student Overview -->
+		<main class="">
+			<div class="flex flex-row md:flex-nowrap flex-wrap justify-between gap-6">
+				<!-- Student Info -->
+				<div class="bg-white p-4 rounded shadow w-full">
+					<img
+						src="{{ student.passport.url }}"
+						alt="Profile"
+						class="w-32 h-32 object-cover rounded-full mx-auto" />
+					<h2 class="text-center mt-2 font-semibold text-lg">
+						{{ student.surname }}, {{ student.otherNames }}
+					</h2>
+					<p class="text-center text-sm text-gray-500">
+						{{ student.matricNumber }}
+					</p>
+					<p class="text-center text-sm text-gray-500">
+						JAMB: {{ student.jambNumber }}
+					</p>
+				</div>
+
+				<div class="flex flex-col justify-between md:max-w-[400px] w-full">
+					<!-- Academic Status -->
+					<div class="bg-white p-4 rounded shadow h-fit">
+						<h3 class="font-semibold text-sm">Academic Status</h3>
+						<p class="text-2xl capitalize font-bold">
+							{{ student.student_status }}
+						</p>
+						<p class="text-sm text-gray-500">
+							{{ student.currentSession }}
+						</p>
+					</div>
+
+					<!-- Programme Details -->
+					<div class="bg-white p-4 rounded shadow h-fit">
+						<h3 class="font-semibold text-sm">Programme</h3>
+						<p class="text-2xl font-bold uppercase">{{ student.degree }}</p>
+						<p class="text-sm text-gray-500">
+							{{ student.programme }}
+						</p>
+					</div>
+				</div>
+
+				<div class="flex flex-col justify-between md:max-w-[400px] w-full">
+					<div class="bg-white p-4 rounded shadow h-fit">
+						<h3 class="font-semibold text-sm">Entry Details</h3>
+						<p class="text-2xl font-bold">{{ student.entryLevel }}</p>
+						<p class="text-sm text-gray-500">
+							{{ student.modeOfEntry }}
+						</p>
+					</div>
+
+					<div class="bg-white p-4 rounded shadow h-fit">
+						<h3 class="font-semibold text-sm">Level Status</h3>
+						<p class="text-2xl capitalize font-bold">
+							{{ student.currentLevel }}
+						</p>
+						<p class="text-sm text-gray-500">
+							{{ student.degree }}
+						</p>
+					</div>
+				</div>
+			</div>
+
+			<!-- Personal Information -->
+			<div class="mt-6 grid md:grid-cols-2 gap-6">
+				<div class="bg-white border border-neutral-100 p-4 rounded shadow">
+					<h3 class="font-semibold text-2xl mb-4">
+						Personal Information
+					</h3>
+					<div class="flex flex-col gap-4">
+						<div class="flex flex-col md:flex-row gap-y-4 justify-between">
+							<div class="flex flex-1 flex-col gap-1">
+								<h3 class="text-gray-500 font-medium">
+									Date of Birth:
+								</h3>
+								<p>{{ student.dateOfBirth }}</p>
+							</div>
+							<div class="flex flex-1 flex-col gap-1">
+								<h3 class="text-gray-500 font-medium">
+									Gender:
+								</h3>
+								<p>{{ student.gender }}</p>
+							</div>
+						</div>
+						<div class="flex flex-col md:flex-row gap-y-4 justify-between">
+							<div class="flex flex-1 flex-col gap-1">
+								<h3 class="text-gray-500 font-medium">
+									Blood Group:
+								</h3>
+								<p>{{ student.bloodGroup }}</p>
+							</div>
+							<div class="flex flex-1 flex-col gap-1">
+								<h3 class="text-gray-500 font-medium">
+									Genotype:
+								</h3>
+								<p>{{ student.genoType }}</p>
+							</div>
+						</div>
+					</div>
+					<!-- DIVIDER -->
+					<div
+						class="h-[1px] bg-gray-200 w-full rounded-md my-6"></div>
+
+					<div class="flex flex-1 flex-col gap-1">
+						<h3 class="text-gray-500 font-medium">Nationality:</h3>
+						<p>{{ student.nationality }}</p>
+					</div>
+
+					<div class="flex flex-col md:flex-row gap-y-4 justify-between mt-4">
+						<div class="flex flex-1 flex-col gap-1">
+							<h3 class="text-gray-500 font-medium">
+								State of Origin:
+							</h3>
+							<p>{{ student.stateOfOrigin }}</p>
+						</div>
+
+						<div class="flex flex-1 flex-col gap-1">
+							<h3 class="text-gray-500 font-medium">LGA:</h3>
+							<p>{{ student.localGovtArea }}</p>
+						</div>
+					</div>
+				</div>
+
+				<!-- Contact Information -->
+				<div class="bg-white p-4 rounded shadow">
+					<h3 class="font-semibold text-2xl mb-4">Contact Information</h3>
+					<div class="flex flex-col gap-4">
+
+						<div class="flex flex-1 flex-col gap-1">
+							<h3 class="text-gray-500 font-medium">Primary Email:</h3>
+							<p>{{ student.primaryEmail }}</p>
+						</div>
+						<div class="flex flex-1 flex-col gap-1">
+							<h3 class="text-gray-500 font-medium">Student Email:</h3>
+							<p>{{ student.studentEmail }}</p>
+						</div>
+						<div class="flex flex-1 flex-col gap-1">
+							<h3 class="text-gray-500 font-medium">Phone Number:</h3>
+							<p>{{ student.studentPhoneNumber }}</p>
+						</div>
+					</div>
+				</div>
+
+				<!-- Academic Information -->
+			</div>
+			<div class="bg-white p-4 mt-6 rounded shadow">
+				<h3 class="font-semibold text-2xl mb-4">Academic Information</h3>
+				<div class="flex flex-row gap-4 justify-between flex-wrap">
+					<div class="flex flex-col w-full max-w-[500px] gap-1">
+						<h3 class="text-gray-500 font-medium">College:</h3>
+						<p class="capitalize">{{ student.college.name }}</p>
+					</div>
+					<div class="flex flex-col w-full max-w-[500px] gap-1">
+						<h3 class="text-gray-500 font-medium">Department:</h3>
+						<p class="capitalize">{{ student.department.name }}</p>
+					</div>
+					<div class="flex flex-col w-full max-w-[500px] gap-1">
+						<h3 class="text-gray-500 font-medium">Programme:</h3>
+						<p class="capitalize">{{ student.programme.name }}</p>
+					</div>
+
+					<div class="flex flex-col w-full max-w-[500px] gap-1">
+						<h3 class="text-gray-500 font-medium">Current Level:</h3>
+						<p class="capitalize">{{ student.currentLevel }}</p>
+					</div>
+					<div class="flex flex-col w-full max-w-[500px] gap-1">
+						<h3 class="text-gray-500 font-medium">Current Session:</h3>
+						<p class="capitalize">{{ student.currentSession }}</p>
+					</div>
+					<div class="flex flex-col w-full max-w-[500px] gap-1">
+						<h3 class="text-gray-500 font-medium">Degree:</h3>
+						<p class="capitalize">{{ student.programme.degree }}</p>
+					</div>
+				</div>
+			</div>
+
+			<!-- Quick Actions -->
+			<div class="mt-6 bg-white p-4 rounded shadow">
+				<h3 class="font-semibold">Quick Actions</h3>
+				<div class="grid md:grid-cols-4 gap-4 mt-4">
+                    <button onclick="location.href='/';" class="py-2 px-3 bg-transparent hover:bg-gray-100 duration-300 rounded border border-neutral-200">
+						Home
+					</button>
+                    <button onclick="location.href='/';" class="py-2 px-3 bg-transparent hover:bg-gray-100 duration-300 rounded border border-neutral-200">
+						Courses
+					</button>
+                    <button onclick="location.href='/result/filter';" class="py-2 px-3 bg-transparent hover:bg-gray-100 duration-300 rounded border border-neutral-200">
+
+						🎓 Check Results
+					</button>
+                    <button onclick="location.href='/profile';" class="py-2 px-3 bg-transparent hover:bg-gray-100 duration-300 rounded border border-neutral-200">
+						Profile
+					</button>
+					<button class="py-2 px-3 bg-transparent hover:bg-gray-100 duration-300 rounded border border-neutral-200">
+						📅 View Timetable
+					</button>
+					
+					<button class="py-2 px-3 bg-transparent hover:bg-gray-100 duration-300 rounded border border-neutral-200">
+						💰 Pay Fees</button>
+					<button class="py-2 px-3 bg-transparent hover:bg-gray-100 duration-300 rounded border border-neutral-200">
+
+						📢 View Announcements
+					</button>
+				</div>
+			</div>
+		</main>
+	</div>
+</div>
+{% endblock %} {% block extra_scripts %}
+<script type="text/javascript" src="{% static 'js/dashboard.js' %}"></script>
+{% endblock %}
