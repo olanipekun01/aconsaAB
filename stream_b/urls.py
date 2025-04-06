@@ -4,7 +4,7 @@ from . import views
 app_name = 'stream_b'
 
 urlpatterns = [
-    # path('', views.Dashboard, name='dashboard'),
+    path('', views.Dashboard, name='dashboard'),
     # path('courses/', views.Courses, name='courses'),
     # path('course/delete/<str:id>/', views.CourseDelete, name='course_delete'),
     # path('result/filter/', views.ResultFilter, name='result_filter'),

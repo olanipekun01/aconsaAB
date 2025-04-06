@@ -29,8 +29,8 @@ handler404 = custom_404_view
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('common.urls')),
-    path('stream-a/', include('stream_a.urls')),
-    path('stream-b/', include('stream_b.urls')),
+    path('stream_a/', include('stream_a.urls')),
+    path('stream_b/', include('stream_b.urls')),
     # Add instructor and advisor apps later if seperated
 ]
 

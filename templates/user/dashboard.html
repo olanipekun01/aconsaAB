@@ -29,6 +29,12 @@
 			</div>
 		</header>
 
+		<div class="mb-3">
+			{% for message in messages %}
+				<h5 style="color: red">{{message}}</h5>
+			{% endfor %}
+		</div>
+
 		<!-- Student Overview -->
 		<main class="">
 			<div class="flex flex-row md:flex-nowrap flex-wrap justify-between gap-6">

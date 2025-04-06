@@ -136,3 +136,13 @@ STATIC_ROOT = BASE_DIR / "staticfiles"
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+# Custom login URL
+LOGIN_URL = '/login/'  # Absolute path to your common login view
+
+# Optional: Define redirect after login
+LOGIN_REDIRECT_URL = '/'  # Where to go after login if no 'next' parameter
+
+# Optional: Define logout redirect
+LOGOUT_REDIRECT_URL = '/login/'

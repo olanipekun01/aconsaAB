@@ -18,7 +18,7 @@ class CustomUser(AbstractUser):
     )
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, unique=True)
     user_type = models.CharField(max_length=15, choices=USER_TYPE_CHOICES)
-    stream = models.CharField(max_length=1, choices=STREAM_CHOICES, default='a')
+    stream = models.CharField(max_length=1, choices=STREAM_CHOICES)
 
     def set_password(self, raw_password):
         """Hash and set the password."""
@@ -27,6 +27,9 @@ class CustomUser(AbstractUser):
     def check_password(self, raw_password):
         """Check the password against the stored hashed password."""
         return check_password(raw_password, self.password)
+
+    def __str__(self):
+        return f"{self.username} ({self.stream})"
     
 class SessionBase(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, unique=True)
@@ -40,6 +43,8 @@ class SessionBase(models.Model):
         if self.is_current:
             self.__class__.objects.filter(is_current=True).exclude(id=self.id).update(is_current=False)
         super().save(*args, **kwargs)
+
+    
 
 class SemesterBase(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
