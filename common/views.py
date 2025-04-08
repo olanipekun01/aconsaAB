@@ -110,9 +110,9 @@ def Redirect(request):
                 elif user.stream == "b":
                     return redirect("stream_b:dashboard")
             elif user.user_type == "instructor":
-                return redirect("/instructor/dashboard")  # Define this URL later
+                return redirect("/instructor/dashboard")  
             elif user.user_type == "leveladvisor":
-                return redirect("/advisor/dashboard")  # Define this URL later
+                return redirect("/advisor/dashboard")  
             else:
                 messages.error(request, "Unknown user type.")
                 return redirect("/login/")
