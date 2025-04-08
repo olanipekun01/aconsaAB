@@ -20,13 +20,13 @@ handler404 = custom_404_view
 urlpatterns = [
     path('', views.Dashboard, name='dashboard'),
     path('courses/', views.Courses, name='courses'),
-    # path('course/delete/<str:id>/', views.CourseDelete, name='course_delete'),
-    # path('result/filter/', views.ResultFilter, name='result_filter'),
-    # path('result/view/', views.ResultView, name='result_view'),
-    # path('print/', views.printCopy, name='print_copy'),
+    path('course/delete/<str:id>/', views.CourseDelete, name='course_delete'),
+    path('result/filter/', views.ResultFilter, name='result_filter'),
+    path('result/view/', views.ResultView, name='result_view'),
+    path('print/', views.printCopy, name='print_copy'),
     # path('contact/', views.Contact, name='contact'),
     # path('accounts/changepassword/', views.changePassword, name='change_password'),
-    # path('profile/', views.Profile, name='profile'),
+    path('profile/', views.Profile, name='profile'),
     
     re_path(r'^media/(?P<path>.*)$', serve,{'document_root': settings.MEDIA_ROOT}),
     re_path(r'^static/(?P<path>.*)$', serve,{'document_root': settings.STATIC_ROOT}),

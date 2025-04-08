@@ -63,38 +63,42 @@ def logoutView(request):
 @login_required
 @user_passes_test(is_student, login_url="/404")
 def changePassword(request):
-    if request.method == "POST":
-        old_password = request.POST["oldpassword"]
-        new_password = request.POST["newpassword"]
-        confirm_password = request.POST["newpassword"]
-
-        if new_password != confirm_password:
-            return render(
-                request, "user/changepassword.html", {"error": "Use same password"}
-            )
-
-        if len(new_password) < 8:
-            messages.error(request, "Password must be at least 8 characters long.")
-            return render(request, "common/change_password.html")
-
+    if request.user.is_authenticated:
         user = request.user
 
-        if user.check_password(old_password):
-            user.set_password(new_password)
-            user = auth.authenticate(username=user.username, password=new_password)
-            auth.login(request, user)
-            messages.success(request, "Password changed successfully!")
-            if user.user_type == "student":
-                return redirect(f"stream_{user.stream}:change_password")
-            elif user.user_type == "instructor":
-                return redirect("instructor_change_password") 
-            elif user.user_type == "leveladvisor":
-                return redirect("level_advisor_change_password")
-        else:
-            messages.error(request, "Incorrect old password.")
-            return render(request, "common/change_password.html")
+        if request.method == "POST":
+            old_password = request.POST["oldpassword"]
+            new_password = request.POST["newpassword"]
+            confirm_password = request.POST["newpassword"]
 
-    return render(request, "common/changepassword.html")
+            if new_password != confirm_password:
+                return render(
+                    request, "user/changepassword.html", {"error": "Use same password"}
+                )
+
+            if len(new_password) < 8:
+                messages.error(request, "Password must be at least 8 characters long.")
+                return render(request, "common/change_password.html")
+
+            user = request.user
+
+            if user.check_password(old_password):
+                user.set_password(new_password)
+                user = auth.authenticate(username=user.username, password=new_password)
+                auth.login(request, user)
+                messages.success(request, "Password changed successfully!")
+                
+                if user.user_type == "student":
+                    return redirect(f"stream_{user.stream}:change_password")
+                elif user.user_type == "instructor":
+                    return redirect("instructor_change_password") 
+                elif user.user_type == "leveladvisor":
+                    return redirect("level_advisor_change_password")
+            else:
+                messages.error(request, "Incorrect old password.")
+                return render(request, "common/change_password.html", {"stream": user.stream})
+
+        return render(request, "common/changepassword.html", {"stream": user.stream})
 
 @login_required
 def Redirect(request):

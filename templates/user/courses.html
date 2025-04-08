@@ -48,7 +48,7 @@
 
             <span id="totalUnits">0</span>
           </div>
-          <form class='flex flex-col gap-4' method='post' action='/courses/'>
+          <form class='flex flex-col gap-4' method='post' action="{% url 'stream_'|add:stream|add:':courses' %}">
             {% csrf_token %}
             <p id="warning" style="color: red; display: none;">You have exceeded the maximum allowed units!</p>
             <table class="min-w-full border-collapse border border-gray-200">
@@ -115,7 +115,7 @@
 
         <!-- Table -->
         <div class="overflow-x-auto">
-          <form class='flex flex-col gap-4' method='post' action='/print'>
+          <form class='flex flex-col gap-4' method='post' action="{% url 'stream_'|add:stream|add:':print_copy' %}">
           {% csrf_token %}
           <table class="w-full table-auto border-collapse border border-gray-200">
             <!-- Table Header -->
@@ -143,7 +143,7 @@
                     <td class="border p-2 text-left">{{data.registration.course.status}}</td>
                     <td class="border p-2 text-left">{{data.registration.instructor_remark}}</td>
                     {% if data.registration.instructor_remark == 'rejected' %}
-                    <td class="border p-2 text-left"><a href="/course/delete/{{data.registration.id}}" class="text-red-700 underline">del</a></td>
+                    <td class="border p-2 text-left"><a href="{% url 'stream_'|add:stream|add:':course_delete' data.registration.id %}" class="text-red-700 underline">del</a></td>
                     {% else %}
                     <td class="border p-2 text-left"></td>
                     {% endif %}
@@ -168,7 +168,7 @@
 
       <!-- Table -->
         <div class="overflow-x-auto">
-          <form class='flex flex-col gap-4' method='post' action='/print'>
+          <form class='flex flex-col gap-4' method='post' action="{% url 'stream_'|add:stream|add:':print_copy' %}">
           {% csrf_token %}
           <table class="w-full table-auto border-collapse border border-gray-200">
             <!-- Table Header -->
@@ -196,7 +196,7 @@
                     <td class="border p-2 text-left">{{data.registration.course.status}}</td>
                     <td class="border p-2 text-left">{{data.registration.instructor_remark}}</td>
                     {% if data.registration.instructor_remark == 'rejected' %}
-                    <td class="border p-2 text-left"><a href="http://">del</a></td>
+                    <td class="border p-2 text-left"><a href="{% url 'stream_'|add:stream|add:':course_delete' data.registration.id %}">del</a></td>
                     {% else %}
                     <td class="border p-2 text-left"></td>
                     {% endif %}
@@ -224,17 +224,17 @@
     <div class="mt-6 bg-white p-4 rounded shadow">
       <h3 class="font-semibold">Quick Actions</h3>
       <div class="grid md:grid-cols-4 gap-4 mt-4">
-                  <button onclick="location.href='/';" class="py-2 px-3 bg-transparent hover:bg-gray-100 duration-300 rounded border border-neutral-200">
+                  <button onclick="location.href='{% url 'stream_'|add:stream|add:':dashboard' %}';" class="py-2 px-3 bg-transparent hover:bg-gray-100 duration-300 rounded border border-neutral-200">
           Home
         </button>
-                  <button onclick="location.href='/';" class="py-2 px-3 bg-transparent hover:bg-gray-100 duration-300 rounded border border-neutral-200">
+                  <button onclick="location.href='{% url 'stream_'|add:stream|add:':courses' %}';" class="py-2 px-3 bg-transparent hover:bg-gray-100 duration-300 rounded border border-neutral-200">
           Courses
         </button>
-                  <button onclick="location.href='/result/filter';" class="py-2 px-3 bg-transparent hover:bg-gray-100 duration-300 rounded border border-neutral-200">
+                  <button onclick="location.href='{% url 'stream_'|add:stream|add:':result_filter' %}';" class="py-2 px-3 bg-transparent hover:bg-gray-100 duration-300 rounded border border-neutral-200">
 
           🎓 Check Results
         </button>
-                  <button onclick="location.href='/profile';" class="py-2 px-3 bg-transparent hover:bg-gray-100 duration-300 rounded border border-neutral-200">
+                  <button onclick="location.href='{% url 'stream_'|add:stream|add:':profile' %}';" class="py-2 px-3 bg-transparent hover:bg-gray-100 duration-300 rounded border border-neutral-200">
           Profile
         </button>
         <button class="py-2 px-3 bg-transparent hover:bg-gray-100 duration-300 rounded border border-neutral-200">

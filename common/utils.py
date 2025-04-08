@@ -1,5 +1,16 @@
 from fpdf import FPDF, HTMLMixin
 
+import csv
+from django.http import HttpResponse
+from datetime import datetime
+
+import csv
+from django.http import HttpResponse
+from datetime import datetime
+import os
+
+from django.conf import settings
+
 # PDF generation functions (unchanged from your original file)
 def generate_course_pdf(reg_course, student, session, semester, confirmReg):
     class PDF(FPDF, HTMLMixin):
@@ -99,7 +110,7 @@ def generate_course_pdf(reg_course, student, session, semester, confirmReg):
     pdf.cell(145, 7, f"Signature of H.O.D.: _____________________________________")
     pdf.cell(0, 7, f"Date: __________________________", ln=True)
     pdf.ln(6)
-    pdf.cell(145, 7, f"Signature of DEAN: _____________________________________")
+    pdf.cell(145, 7, f"Signature of PROVOST: _____________________________________")
     pdf.cell(0, 7, f"Date: __________________________", ln=True)
     pdf.ln(3)
     pdf.set_font("times", "B", 6)

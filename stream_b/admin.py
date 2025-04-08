@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Session, College, Department, Programme, Level, Semester, Student, Enrollment, Course
+from .models import Session, College, Department, Programme, Level, Semester, Student, Enrollment, Course, Registration, confirmRegister, Result
 
 
 def formfield_for_foreignkey(self, db_field, request, **kwargs):
@@ -61,3 +61,21 @@ class CourseAdmin(admin.ModelAdmin):
     list_filter = ('status', 'category', 'level', 'semester', 'department')
     search_fields = ('courseCode', 'title')
     filter_horizontal = ('programme',)  # For ManyToManyField
+
+@admin.register(Registration)
+class RegistrationAdmin(admin.ModelAdmin):
+    list_display = ('student', 'course', 'session', 'semester', 'instructor_remark')
+    list_filter = ('session', 'instructor_remark')
+    search_fields = ('student__surname', 'student__matricNumber', 'course__courseCode')
+
+@admin.register(Result)
+class ResultAdmin(admin.ModelAdmin):
+    list_display = ('registration', 'attempt_number', 'grade_type', 'grade_remark', 'passed', 'carried_over')
+    list_filter = ('attempt_number', 'grade_type', 'grade_remark', 'passed', 'carried_over')
+    search_fields = ('registration__student__surname', 'registration__student__matricNumber')
+
+@admin.register(confirmRegister)
+class ConfirmRegAdmin(admin.ModelAdmin):
+    list_display = ('student', 'session', 'semester', 'level', 'gpa', 'totalUnits')
+    list_filter = ('session', 'gpa')
+    search_fields = ('student__surname', 'student__matricNumber')

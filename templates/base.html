@@ -89,13 +89,13 @@
         </div>
       </section>
       <ul id="navBar" class="absolute z-20 md:relative mt-4 space-y-2 bg-white z-20">
-        <li><a href="/" class="flex items-center gap-2 p-2 hover:bg-gray-200 rounded">🏠 Home</a></li>
-        <li><a href="courses" class="flex items-center gap-2 p-2 hover:bg-gray-200 rounded">📚 Courses</a></li>
-        <li><a href="result/filter" class="flex items-center gap-2 p-2 hover:bg-gray-200 rounded">📅 Results</a></li>
-        <li><a href="profile" class="flex items-center gap-2 p-2 hover:bg-gray-200 rounded">👩‍🎓 Profile</a></li>
-        <li><a href="change-password" class="flex items-center gap-2 p-2 hover:bg-gray-200 rounded">👩‍🎓 Change password</a></li>
+        <li><a href="{% url 'stream_'|add:stream|add:':dashboard' %}" class="flex items-center gap-2 p-2 hover:bg-gray-200 rounded">🏠 Home</a></li>
+        <li><a href="{% url 'stream_'|add:stream|add:':courses' %}" class="flex items-center gap-2 p-2 hover:bg-gray-200 rounded">📚 Courses</a></li>
+        <li><a href="{% url 'stream_'|add:stream|add:':result_filter' %}" class="flex items-center gap-2 p-2 hover:bg-gray-200 rounded">📅 Results</a></li>
+        <li><a href="{% url 'stream_'|add:stream|add:':profile' %}" class="flex items-center gap-2 p-2 hover:bg-gray-200 rounded">👩‍🎓 Profile</a></li>
+        <li><a href="{% url 'common:change_password' %}" class="flex items-center gap-2 p-2 hover:bg-gray-200 rounded">👩‍🎓 Change password</a></li>
         <li class="lg:fixed lg:bottom-0">
-        <a href="/logout" class="flex items-center gap-2 p-2 hover:bg-gray-200 rounded">📴 Logout</a>
+        <a href="{% url 'common:logout' %}" class="flex items-center gap-2 p-2 hover:bg-gray-200 rounded">📴 Logout</a>
         </li>
       </ul>
 
@@ -114,11 +114,11 @@
         <div>
           <h3 class="text-lg font-semibold mb-4">Quick Links</h3>
           <ul class="space-y-2">
-            <li><a href="/" class="hover:text-[#926868]">Home</a></li>
-            <li><a href="/courses" class="hover:text-[#926868]">Courses</a></li>
-            <li><a href="/result/filter/" class="hover:text-[#926868]">Result</a></li>
-            <li><a href="/profile" class="hover:text-[#926868]">Profile</a></li>
-            <li><a href="/change-password/" class="hover:text-[#926868]">Change Password</a></li>
+            <li><a href="{% url 'stream_'|add:stream|add:':dashboard' %}" class="hover:text-[#926868]">Home</a></li>
+            <li><a href="{% url 'stream_'|add:stream|add:':courses' %}" class="hover:text-[#926868]">Courses</a></li>
+            <li><a href="{% url 'stream_'|add:stream|add:':result_filter' %}" class="hover:text-[#926868]">Result</a></li>
+            <li><a href="{% url 'stream_'|add:stream|add:':profile' %}" class="hover:text-[#926868]">Profile</a></li>
+            <li><a href="{% url 'common:change_password' %}" class="hover:text-[#926868]">Change Password</a></li>
           </ul>
         </div>
         <div>
