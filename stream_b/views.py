@@ -1,32 +1,40 @@
-from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth.decorators import login_required, user_passes_test
-from django.core.exceptions import ObjectDoesNotExist
-# Create your views here.
-from django.contrib import messages
-from common.models import CustomUser
-from common.utils import *
-
-from .models import *
-from django.db.models import Q, F, OuterRef, Subquery, Max
-from django.db.models import Sum, Min
-
 import csv
-from django.http import HttpResponse
-from datetime import datetime
+import json
 import os
-
-
-import uuid
 import random
 import string
-import json
-from django.core.exceptions import ObjectDoesNotExist
+import uuid
+from datetime import datetime
+from functools import reduce
 
+import pandas as pd
 import fpdf
 from fpdf import FPDF, HTMLMixin
 
+from django.conf import settings
+from django.contrib import messages
+from django.contrib.auth import login, get_user_model
+from django.contrib.auth.decorators import login_required, user_passes_test
+from django.contrib.auth.forms import PasswordResetForm, SetPasswordForm
+from django.contrib.auth.models import User, auth
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.tokens import default_token_generator
+from django.core.exceptions import ObjectDoesNotExist
+from django.core.mail import send_mail
+from django.db import transaction
+from django.db.models import (
+    Max, Q, F, Sum, Min, OuterRef, Subquery
+)
+from django.forms.models import model_to_dict
 from django.http import HttpResponse
+from django.shortcuts import render, redirect, get_object_or_404
 from django.template.loader import render_to_string
+from django.urls import reverse
+from django.utils.encoding import force_bytes, force_str
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from django.contrib.sites.shortcuts import get_current_site
+
+from .models import *
 
 
 # Role check for students
@@ -110,7 +118,7 @@ def Courses(request):
 
             total_units = total_units + new_units
 
-            if total_units <= 5:
+            if total_units <= 30:
                 for id in courses:
 
                     course = (get_object_or_404(Course, id=id),)
