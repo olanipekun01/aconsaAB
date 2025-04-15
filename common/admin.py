@@ -26,3 +26,7 @@ class CustomUserAdmin(UserAdmin):
     ordering = ('username',)
 
 admin.site.register(CustomUser, CustomUserAdmin)
+
+admin.site.register(Instructor)
+
+admin.site.register(LevelAdvisor)
