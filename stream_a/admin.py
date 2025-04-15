@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Session, College, Department, Programme, Level, Semester, Student, Enrollment, Course, Registration, confirmRegister, Result
+from .models import Session, College, Department, Programme, Level, Semester, Student, Enrollment, Course, Registration, confirmRegister, Result, LevelAdvisor
 
 
 def formfield_for_foreignkey(self, db_field, request, **kwargs):
@@ -79,3 +79,9 @@ class ConfirmRegAdmin(admin.ModelAdmin):
     list_display = ('student', 'session', 'semester', 'level', 'gpa', 'totalUnits')
     list_filter = ('session', 'gpa')
     search_fields = ('student__surname', 'student__matricNumber')
+
+@admin.register(LevelAdvisor)
+class LevelAdvisorAdmin(admin.ModelAdmin):
+    list_display = ('user', 'name', 'department', 'level', 'stream')
+    list_filter = ('department', 'level')
+    search_fields = ('name', 'departemt')

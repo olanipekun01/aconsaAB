@@ -126,15 +126,17 @@ class Course(models.Model):
 
 
 
+
 class LevelAdvisor(models.Model):
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, related_name='stream_b_advisor', primary_key=True)
     name = models.CharField(blank=True, null=True, max_length=500)
     department = models.ForeignKey(Department, on_delete=models.CASCADE)
     level = models.ForeignKey(Level, on_delete=models.CASCADE)
     passport = models.ImageField(upload_to="images/", default='images/placeholder.png', null=True, blank=True)
+    stream = models.CharField(max_length=1, default='b')
 
     def __str__(self):
-        return f'Level Advisor - {self.level.name} -{self.name}'
+        return f'Level Advisor - {self.level.name} - {self.name}'
     
 
 

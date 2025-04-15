@@ -126,6 +126,7 @@ class LevelAdvisor(models.Model):
     department = models.ForeignKey(Department, on_delete=models.CASCADE)
     level = models.ForeignKey(Level, on_delete=models.CASCADE)
     passport = models.ImageField(upload_to="images/", default='images/placeholder.png', null=True, blank=True)
+    stream = models.CharField(max_length=1, default='a')
 
     def __str__(self):
         return f'Level Advisor - {self.level.name} -{self.name}'

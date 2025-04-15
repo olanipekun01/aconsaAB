@@ -101,13 +101,5 @@ class Instructor(models.Model):
     def __str__(self):
         return self.name
 
-class LevelAdvisor(models.Model):
-    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, primary_key=True)
-    name = models.CharField(blank=True, null=True, max_length=500)
-    department = models.ForeignKey(Department, on_delete=models.CASCADE)
-    level = models.ForeignKey(Level, on_delete=models.CASCADE)
-    passport = models.ImageField(upload_to="images/", default='images/placeholder.png', null=True, blank=True)
 
-    def __str__(self):
-        return f'Level Advisor - {self.level.name} -{self.name}'
     
