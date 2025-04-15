@@ -28,6 +28,13 @@ urlpatterns = [
     # path('accounts/changepassword/', views.changePassword, name='change_password'),
     path('profile/', views.Profile, name='profile'),
 
+
+
+
+    #advisors dashboard
+    path('advisor/dashboard/', views.AdvisorDashboard, name='advisor_dashboard'),
+
+
     re_path(r'^media/(?P<path>.*)$', serve,{'document_root': settings.MEDIA_ROOT}),
     re_path(r'^static/(?P<path>.*)$', serve,{'document_root': settings.STATIC_ROOT}),
     # path('404', views.F404, name='f404')

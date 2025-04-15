@@ -43,6 +43,9 @@ UserModel = get_user_model()
 def is_student(user):
     return user.is_authenticated and user.user_type == "student"
 
+def is_advisor(user):
+    return user.user_type == "leveladvisor"
+
 
 @login_required
 @user_passes_test(is_student, login_url="/404")
@@ -762,3 +765,70 @@ def Profile(request):
             return redirect('stream_a:profile')
 
         return render(request, "user/profile.html", {"student": student, "stream":user.stream})
+
+@login_required
+@user_passes_test(is_advisor, login_url="/404")
+def AdvisorDashboard(request):
+    if request.user.is_authenticated:
+        user = request.user
+        advisor = get_object_or_404(LevelAdvisor, user=user)
+
+        if user.stream != "a":
+            # Redirect to the correct stream's dashboard
+            if user.stream == "b":
+                messages.info(request, "You have been redirected to your Stream B dashboard.")
+                return redirect("stream_b:advisor_dashboard")
+            else:
+                messages.error(request, "Invalid stream for this user.")
+                return redirect("/login/")
+        
+
+        current_session_model = Session.objects.filter(is_current=True).first()
+        current_semester_model = Semester.objects.filter(is_current=True).first()
+
+        total_students = len(Student.objects.filter(currentLevel=advisor.level, user__stream=advisor.user.stream))
+        pending_reg = Registration.objects.filter(
+            student__department=advisor.department,
+            student__currentLevel=advisor.level,
+            session=current_session_model,
+            semester=current_semester_model,
+            instructor_remark="pending",
+        )
+        rejected_reg = Registration.objects.filter(
+            student__department=advisor.department,
+            student__currentLevel=advisor.level,
+            session=current_session_model,
+            semester=current_semester_model,
+            instructor_remark="rejected",
+        )
+
+        # pending_students = Registration.objects.filter(
+        #     course__department=advisor.department,
+        #     session=current_session_model,
+        #     semester=current_semester_model,
+        #     instructor_remark='pending'
+        # ).values('student').distinct()
+
+        # # If you want actual Student objects:
+        # unique_pending_students = Student.objects.filter(
+        #     id__in=[entry['student'] for entry in pending_students]
+        # )
+
+        pending_students = Student.objects.filter(
+            registration__course__department=advisor.department,
+            registration__student__currentLevel=advisor.level,
+            user__stream=advisor.user.stream,
+            registration__session=current_session_model,
+            registration__semester=current_semester_model,
+            registration__instructor_remark="pending",
+        ).distinct()
+
+        return render(
+            request,
+            "levelAdvisor/dashboard.html",
+            {
+                "totalStudents": total_students,
+                "totalPendingReg": len(pending_reg),
+                "level": advisor.level,
+                "pendingReg": pending_students,
+                "totalRejectedReg": 
