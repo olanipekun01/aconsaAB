@@ -831,4 +831,6 @@ def AdvisorDashboard(request):
                 "totalPendingReg": len(pending_reg),
                 "level": advisor.level,
                 "pendingReg": pending_students,
-                "totalRejectedReg": 
+                "totalRejectedReg": len(rejected_reg),
+            },
+        )
