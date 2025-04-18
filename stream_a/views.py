@@ -802,17 +802,7 @@ def AdvisorDashboard(request):
             instructor_remark="rejected",
         )
 
-        # pending_students = Registration.objects.filter(
-        #     course__department=advisor.department,
-        #     session=current_session_model,
-        #     semester=current_semester_model,
-        #     instructor_remark='pending'
-        # ).values('student').distinct()
-
-        # # If you want actual Student objects:
-        # unique_pending_students = Student.objects.filter(
-        #     id__in=[entry['student'] for entry in pending_students]
-        # )
+       
 
         pending_students = Student.objects.filter(
             registration__course__department=advisor.department,
@@ -832,5 +822,256 @@ def AdvisorDashboard(request):
                 "level": advisor.level,
                 "pendingReg": pending_students,
                 "totalRejectedReg": len(rejected_reg),
+                "stream":user.stream,
             },
         )
+
+login_required
+@user_passes_test(is_advisor, login_url="/404")
+def StudentList(request):
+    if request.user.is_authenticated:
+        user = request.user
+        advisor = get_object_or_404(LevelAdvisor, user=user)
+
+        if user.stream != "a":
+            # Redirect to the correct stream's dashboard
+            if user.stream == "b":
+                messages.info(request, "You have been redirected to your Stream B dashboard.")
+                return redirect("stream_b:advisor_dashboard")
+            else:
+                messages.error(request, "Invalid stream for this user.")
+                return redirect("/login/")
+
+        current_session_model = Session.objects.filter(is_current=True).first()
+        print("current session", current_session_model)
+        current_semester_model = Semester.objects.filter(is_current=True).first()
+        courses = Course.objects.all()
+
+        if request.method == "POST":
+            matricNo = request.POST["matricNo"].strip()
+            if matricNo != "":
+                try:
+                    student = (
+                        Student.objects.all()
+                        .filter(
+                            Q(matricNumber=matricNo) | Q(jambNumber=matricNo),
+                            department=advisor.department,
+                            currentLevel=advisor.level,
+                            currentSession=current_session_model,
+                            
+                        )
+                        .first()
+                    )
+
+                    if student:
+                        student_data = []
+
+                        registrations = Registration.objects.filter(
+                            student=student,
+                            session=current_session_model,
+                            semester=current_semester_model,
+                        )
+                        approved_count = registrations.filter(
+                            instructor_remark="approved"
+                        ).count()
+                        pending_count = registrations.filter(
+                            instructor_remark="pending"
+                        ).count()
+
+                        # Append the data
+                        student_data.append(
+                            {
+                                "student": student,
+                                "approved_courses": approved_count,
+                                "pending_courses": pending_count,
+                            }
+                        )
+
+                        return render(
+                            request,
+                            "levelAdvisor/student.html",
+                            {
+                                "student_data": student_data,
+                                "curr_sess": current_session_model,
+                                "curr_semes": current_semester_model,
+                                "stream": user.stream,
+                            },
+                        )
+                    else:
+                        messages.error(request, f"Student not found!")
+                        return redirect("stream_a:advisor_students")
+                except Exception as e:
+                    messages.error(request, f"An error occurred: {str(e)}")
+                    return redirect("stream_a:advisor_students")
+
+        students = Student.objects.filter(
+            department=advisor.department,
+            currentLevel=advisor.level,
+            currentSession=current_session_model,
+            user__stream=advisor.user.stream,
+        )
+
+        student_data = []
+
+        for student in students:
+            # Get the registrations for the current session and semester
+            registrations = Registration.objects.filter(
+                student=student,
+                session=current_session_model,
+                semester=current_semester_model,
+            )
+            approved_count = registrations.filter(instructor_remark="approved").count()
+            pending_count = registrations.filter(instructor_remark="pending").count()
+
+            # Append the data
+            student_data.append(
+                {
+                    "student": student,
+                    "approved_courses": approved_count,
+                    "pending_courses": pending_count,
+                }
+            )
+
+        return render(
+            request,
+            "levelAdvisor/student.html",
+            {
+                "student_data": student_data,
+                "curr_sess": current_session_model,
+                "curr_semes": current_semester_model,
+                "stream": user.stream,
+            },
+        )
+
+        students = Student.objects.filter(
+            department=advisor.department,
+            currentLevel=advisor.level,
+            currentSession=current_session_model,
+            user__stream=advisor.user.stream,
+        )
+
+        student_data = []
+        for student in students:
+            # Get the registrations for the current session and semester
+            registrations = Registration.objects.filter(
+                student=student,
+                session=current_session_model,
+                semester=current_semester_model,
+            )
+            approved_count = registrations.filter(instructor_remark="approved").count()
+            pending_count = registrations.filter(instructor_remark="pending").count()
+
+            # Append the data
+            student_data.append(
+                {
+                    "student": student,
+                    "approved_courses": approved_count,
+                    "pending_courses": pending_count,
+                }
+            )
+
+        return render(
+            request,
+            "levelAdvisor/student.html",
+            {
+                "student_data": student_data,
+                "curr_sess": current_session_model,
+                "curr_semes": current_semester_model,
+            },
+        )
+
+
+@login_required
+@user_passes_test(is_advisor, login_url="/404")
+def AdvisorReg(request):
+    if request.user.is_authenticated:
+        user = request.user
+        advisor = get_object_or_404(LevelAdvisor, user=user)
+
+        if user.stream != "a":
+            # Redirect to the correct stream's dashboard
+            if user.stream == "b":
+                messages.info(request, "You have been redirected to your Stream B dashboard.")
+                return redirect("stream_b:advisor_dashboard")
+            else:
+                messages.error(request, "Invalid stream for this user.")
+                return redirect("/login/")
+
+        current_session_model = Session.objects.filter(is_current=True).first()
+        current_semester_model = Semester.objects.filter(is_current=True).first()
+        courses = Course.objects.all()
+
+
+       
+        
+        matricNo = request.GET.get("q")
+
+        
+
+        if matricNo != "":
+            try:
+                student = (
+                    Student.objects.all()
+                    .filter(
+                        Q(matricNumber=matricNo) | Q(jambNumber=matricNo),
+                        department=advisor.department,
+                        currentLevel=advisor.level,
+                        user__stream=user.stream,
+                    )
+                    .first()
+                )
+                
+                if student:
+
+                    enrollment = (
+                        Enrollment.objects.filter(student=student)
+                        .order_by("enrolled_date")
+                        .first()
+                    )
+
+                    if not enrollment:
+                        # Handle case where the student has no enrollment record
+                        messages.info(request, f"No enrollment found!")
+                        redirect(f"stream_a:advisor_reg")
+
+                    enrollment_year = int(enrollment.session.year.split("/")[0])
+
+                    registrations = Registration.objects.filter(
+                        student__department=advisor.department,
+                        student=student,
+                        semester=current_semester_model,
+                        session=current_session_model,
+                    )
+
+                    return render(
+                        request,
+                        "levelAdvisor/studentManagement.html",
+                        {
+                            "department": advisor.department,
+                            "curr_sess": current_session_model,
+                            "curr_semes": current_semester_model,
+                            "student": student,
+                            "matricNo": matricNo,
+                            "courses": courses,
+                            "registrations": registrations,
+                            "stream": user.stream,
+                        },
+                    )
+            except Exception as e:
+                    messages.error(request, f"An error occurred: {str(e)}")
+                    return redirect("stream_a:advisor_reg")
+
+        messages.info(request, f"Field cannot be empty!")
+        redirect(f"stream_a:advisor_reg")
+    return render(
+        request,
+        "levelAdvisor/studentManagement.html",
+        {
+            "department": advisor.department,
+            "curr_sess": current_session_model,
+            "curr_semes": current_semester_model,
+            "stream": user.stream,
+        },
+    )
+
+

@@ -244,12 +244,12 @@
                 <div class="pt-4 px-2 flex flex-col gap-3">
                   <div class="flex flex-row gap-2 align-center">
                       <img src="{% static './assets/bxs-right-arrow.svg' %}" alt="">
-                      <a href="/advisor/dashboard/" class="px-3 bg-[#064b25] text-[#ffffff] py-2 w-[100%] text-[13px] hover:bg-[#ffffff] hover:border-solid hover:border-[#064b25] hover:border-[2px] hover:text-[#064b25]">Home</a>
+                      <a href="{% url 'stream_'|add:stream|add:':advisor_dashboard' %}" class="px-3 bg-[#064b25] text-[#ffffff] py-2 w-[100%] text-[13px] hover:bg-[#ffffff] hover:border-solid hover:border-[#064b25] hover:border-[2px] hover:text-[#064b25]">Home</a>
                   </div>
 
                   <div class="flex flex-row gap-2 align-center">
                       <img src="{% static './assets/bxs-right-arrow.svg' %}" alt="">
-                      <a href="/advisor/students/" class="px-3 bg-[#064b25] text-[#ffffff] py-2 w-[100%] text-[13px] hover:bg-[#ffffff] hover:border-solid hover:border-[#064b25] hover:border-[2px] hover:text-[#064b25]">Students</a>
+                      <a href="{% url 'stream_'|add:stream|add:':advisor_students' %}" class="px-3 bg-[#064b25] text-[#ffffff] py-2 w-[100%] text-[13px] hover:bg-[#ffffff] hover:border-solid hover:border-[#064b25] hover:border-[2px] hover:text-[#064b25]">Students</a>
                   </div>
 
                   
@@ -284,7 +284,7 @@
                 {% endfor %}
                 <div class="space-y-6">
                     <div class="flex justify-between items-center">
-                      <h1 id="level-title" class="text-2xl font-bold text-purple-700">Level: {{level}} Students</h1>
+                      <h1 id="level-title" class="text-2xl font-bold text-purple-700">Level: {{level}} Students - Stream {{stream | upper}}</h1>
                       {% comment %} <select id="level-select" class="w-[180px] border-gray-300 rounded-md shadow-sm">
                         <option value="100">100 Level</option>
                         <option value="200">200 Level</option>
@@ -331,12 +331,12 @@
                           {% for pend in pendingReg %}
                           
                             <tr class="hover:bg-gray-100 cursor-pointer">
-                            
-                              <td class="px-4 py-2"><a href="/advisor/reg/?q={{pend.matricNumber}}">{{pend.surname}} {{pend.otherNames}}</a></td>
+                              
+                              <td class="px-4 py-2"><a href="{% url 'stream_'|add:stream|add:':advisor_reg' %}?q={{pend.matricNumber}}">{{pend.surname}} {{pend.otherNames}}</a></td>
                               <td class="px-4 py-2">{{pend.matricNumber}}</td>
                               <td class="px-4 py-2">{{pend.programme}}</td>
                               <td class="px-4 py-2">
-                                <span class="px-2 py-1 text-xs font-semibold bg-yellow-200 text-yellow-800 rounded"><a href="/advisor/reg/?q={{pend.matricNumber}}">view</a></span>
+                                <span class="px-2 py-1 text-xs font-semibold bg-yellow-200 text-yellow-800 rounded"><a href="{% url 'stream_'|add:stream|add:':advisor_reg' pend.matricNumber %}">view</a></span>
                               </td>
                             
                             </tr>

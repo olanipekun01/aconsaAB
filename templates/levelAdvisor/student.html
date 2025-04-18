@@ -261,12 +261,12 @@
                 <div class="pt-4 px-2 flex flex-col gap-3">
                     <div class="flex flex-row gap-2 align-center">
                         <img src="{% static './assets/bxs-right-arrow.svg' %}" alt="">
-                        <a href="/advisor/dashboard/" class="px-3 bg-[#064b25] text-[#ffffff] py-2 w-[100%] text-[13px] hover:bg-[#ffffff] hover:border-solid hover:border-[#064b25] hover:border-[2px] hover:text-[#064b25]">Home</a>
+                        <a href="{% url 'stream_'|add:stream|add:':advisor_dashboard' %}" class="px-3 bg-[#064b25] text-[#ffffff] py-2 w-[100%] text-[13px] hover:bg-[#ffffff] hover:border-solid hover:border-[#064b25] hover:border-[2px] hover:text-[#064b25]">Home</a>
                     </div>
 
                     <div class="flex flex-row gap-2 align-center">
                         <img src="{% static './assets/bxs-right-arrow.svg' %}" alt="">
-                        <a href="/advisor/students/" class="px-3 bg-[#064b25] text-[#ffffff] py-2 w-[100%] text-[13px] hover:bg-[#ffffff] hover:border-solid hover:border-[#064b25] hover:border-[2px] hover:text-[#064b25]">Students</a>
+                        <a href="{% url 'stream_'|add:stream|add:':advisor_students' %}" class="px-3 bg-[#064b25] text-[#ffffff] py-2 w-[100%] text-[13px] hover:bg-[#ffffff] hover:border-solid hover:border-[#064b25] hover:border-[2px] hover:text-[#064b25]">Students</a>
                     </div>
 
                     
@@ -286,7 +286,7 @@
                         </div>
 
                         <div class="">
-                            <form action="/advisor/students/" method="post" class="">
+                            <form action="{% url 'stream_'|add:stream|add:':advisor_students' %}"" method="post" class="">
                                 {% csrf_token %}
                                 <input name="matricNo" type="text" class="">
                                 <button>Search</button>
@@ -301,9 +301,9 @@
                     {% for message in messages %}
                         <h5 style="color: red">{{message}}</h5>
                     {% endfor %}
-                    <div class="mb-4 flex items-center gap-2">
+                    <!-- <div class="mb-4 flex items-center gap-2">
                       <input type="text" id="search-input" placeholder="Search students..." class="border rounded-lg p-2 w-full">
-                    </div>
+                    </div> -->
                     <div class="h-[600px] overflow-auto">
                         <table class="w-full text-left border-collapse ">
                         <thead>
@@ -334,7 +334,7 @@
                                 {% endif %}
                                 </td>
                                 <td class="border-b p-2">
-                                <a href="/advisor/reg/?q={{data.student.matricNumber}}" class="bg-blue-500 text-white px-3 py-1 rounded">View Details</a>
+                                <a href="{% url 'stream_'|add:stream|add:':advisor_reg' %}?q={{data.student.matricNumber}}" class="bg-blue-500 text-white px-3 py-1 rounded text-[11px] xl:text-[17px]">View Details</a>
                                 </td>
                             </tr>
                             {% endfor %}
@@ -357,105 +357,13 @@
     
 
 
-    <div class="create_programme">
-        <form method="get" action="/instructor/student/management/reg/add/{{matricNo}}/">
-          <!-- {% csrf_token %} -->
-
-          <h4 class="mb-8 text-[23px] ml-5 text-red-700">ADD Course</h1>
-          <select name="course" id="">
-            {% for course in courses %}
-                <option value="{{course.id}}">{{course.courseCode}}</option>
-            {% endfor %}
-          </select>
-
-          
-
-
-          <select name="curr_session" id="">
-            <option value="{{curr_sess}}" class="">{{curr_sess}}</option>
-          </select>
-
-          <select name="curr_semester" id="">
-            <option value="{{curr_semes}}" class="">{{curr_semes}} Semester</option>
-          </select>
-         
-  
-          
-          <button>submit</button>
-        </form>
-        <button
-          id="cancelNewStock"
-          class="cancel_btn"
-          onclick="closeCreateModal()"
-        >
-          cancel
-        </button>
-    </div>
+    
   
 
-    <div class="update_programme">
-        <form method="post" action="/admin/programme/">
-          <!-- {% csrf_token %} -->
-
-          <h4 class="mb-8 text-[23px] ml-5 text-red-700">Update</h1>
-
-        
-          <input
-            id="modalNameInput"
-            type="text"
-            name="programme_name"
-            value="Biochemistry"
-            
-          />
-          <input type="number"  value="4" name="programme_duration" placeholder="duration" />
-         
-  
-          
-          <button>submit</button>
-        </form>
-        <button
-          id="cancelNewStock"
-          class="cancel_btn"
-          onclick="closeUpdateModal()"
-        >
-          cancel
-        </button>
-    </div>
+   
 
 
-    <div class="update_grade">
-        <form method="post" action="/instructor/student/grade/">
-          {% csrf_token %}
-
-          <h4 class="mb-8 text-[23px] ml-2 text-red-700">Input Grade</h1>
-
-            <div class="flex flex-row gap-3 mb-4 mt-3">
-                <span class="font-bold">Course Code:</span>
-                <span id="gradeCode" class="">BCH 201</span>
-            </div>
-
-            <div class="flex flex-row gap-3 mb-4 mt-3">
-                <span class="font-bold">Course Title:</span>
-                <span id="gradeTitle" class="">Biochemistry</span>
-            </div>
-
-            <input type="text" hidden id="registrationIdInput" name="registrationIdInput" value="">
-         
-          <!-- <input type="number"  value="4" name="course_grade" placeholder="duration" /> -->
-          <input type="number" min="0" max="100" step=".01" value=0 name="course_grade" placeholder="grade" />
-         
-  
-          
-          <button>submit</button>
-        </form>
-        <button
-          id="cancelGrade"
-          class="cancel_btn"
-          onclick="closeGradeModal()"
-        >
-          cancel
-        </button>
-    </div>
+    
 
 
 

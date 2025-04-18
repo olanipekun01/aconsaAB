@@ -40,7 +40,10 @@ def loginView(request):
                 elif user.user_type == "instructor":
                     return redirect("/instructor/dashboard")  # Define this URL later
                 elif user.user_type == "leveladvisor":
-                    return redirect("/advisor/dashboard")  # Define this URL later
+                    if user.stream == "a":
+                        return redirect("stream_a:advisor_dashboard")
+                    elif user.stream == "b":
+                        return redirect("stream_b:advisor_dashboard")  # Define this URL later
                 else:
                     messages.error(request, "Unknown user type.")
                     return redirect("/login/")
@@ -93,7 +96,7 @@ def changePassword(request):
                 elif user.user_type == "instructor":
                     return redirect("instructor_change_password") 
                 elif user.user_type == "leveladvisor":
-                    return redirect("level_advisor_change_password")
+                    return redirect(f"stream_{user.stream}:level_advisor_change_password")
             else:
                 messages.error(request, "Incorrect old password.")
                 return render(request, "common/change_password.html", {"stream": user.stream})
@@ -116,7 +119,10 @@ def Redirect(request):
             elif user.user_type == "instructor":
                 return redirect("/instructor/dashboard")  
             elif user.user_type == "leveladvisor":
-                return redirect("/advisor/dashboard")  
+                if user.stream == "a":
+                    return redirect("stream_a:advisor_dashboard")
+                elif user.stream == "b":
+                    return redirect("stream_b:advisor_dashboard")
             else:
                 messages.error(request, "Unknown user type.")
                 return redirect("/login/")

@@ -259,12 +259,12 @@
                 <div class="pt-4 px-2 flex flex-col gap-3">
                     <div class="flex flex-row gap-2 align-center">
                         <img src="{% static './assets/bxs-right-arrow.svg' %}" alt="">
-                        <a href="/advisor/dashboard/" class="px-3 bg-[#064b25] text-[#ffffff] py-2 w-[100%] text-[13px] hover:bg-[#ffffff] hover:border-solid hover:border-[#064b25] hover:border-[2px] hover:text-[#064b25]">Home</a>
+                        <a href="{% url 'stream_'|add:stream|add:':advisor_dashboard' %}" class="px-3 bg-[#064b25] text-[#ffffff] py-2 w-[100%] text-[13px] hover:bg-[#ffffff] hover:border-solid hover:border-[#064b25] hover:border-[2px] hover:text-[#064b25]">Home</a>
                     </div>
 
                     <div class="flex flex-row gap-2 align-center">
                         <img src="{% static './assets/bxs-right-arrow.svg' %}" alt="">
-                        <a href="/advisor/students/" class="px-3 bg-[#064b25] text-[#ffffff] py-2 w-[100%] text-[13px] hover:bg-[#ffffff] hover:border-solid hover:border-[#064b25] hover:border-[2px] hover:text-[#064b25]">Students</a>
+                        <a href="{% url 'stream_'|add:stream|add:':advisor_students' %}"" class="px-3 bg-[#064b25] text-[#ffffff] py-2 w-[100%] text-[13px] hover:bg-[#ffffff] hover:border-solid hover:border-[#064b25] hover:border-[2px] hover:text-[#064b25]">Students</a>
                     </div>
 
                     
@@ -284,7 +284,7 @@
                         </div>
 
                         <div class="">
-                            <form action="/advisor/reg/" method="get" class="">
+                            <form action="{% url 'stream_'|add:stream|add:':advisor_reg' %}" method="get" class="">
                                 <input name="matricNo" type="text" class="">
                                 <button>Search</button>
                             </form>
