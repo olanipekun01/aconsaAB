@@ -248,7 +248,7 @@
             <div>
                 <span>Current Academic Session: {{sess}} ||</span>
                 <span>{{semes}} Semester  ||</span>
-                <a href="/accounts/logout/">Logout</a>
+                <a href="{% url 'common:logout' %}">Logout</a>
             </div>
             
         </div>
@@ -284,10 +284,10 @@
                         </div>
 
                         <div class="">
-                            <form action="{% url 'stream_'|add:stream|add:':advisor_reg' %}" method="get" class="">
+                            <!-- <form action="{% url 'stream_'|add:stream|add:':advisor_reg' %}" method="get" class="">
                                 <input name="matricNo" type="text" class="">
                                 <button>Search</button>
-                            </form>
+                            </form> -->
                         </div>
                     </div>
 
@@ -372,7 +372,7 @@
                             <div class="mt-3">
                                 <div class="flex flex-row gap-9">
                                     <h4 class="font-bold text-[18px] text-uppercase">{{curr_semes}} Semester</h4>
-                                    {% comment %} <span class="">Total Registerred Unit: 24</span> {% endcomment %}
+                                    {% comment %} <span class="">Total Registerred Unit: --</span> {% endcomment %}
                                 </div>
                                 <div class="flex flex-row gap-4 mt-5  border-y-[1px] border-[#000] px-[30px] py-[10px] overflow-x-scroll">
 
@@ -386,9 +386,9 @@
                                             <p class="mt-3 text-[10px]"><span class="text-12px font-bold">Title: </span>{{reg.course.title}}</p>
                                             
                                             <div class="mt-3 flex flex-row justify-between items-center">
-                                                {% if reg.session == curr_sess and reg.semester == curr_semes %}
+                                                <!-- {% if reg.session == curr_sess and reg.semester == curr_semes %}
                                                 <button onclick=""><img class="w-[15px]" src="{% static './assets/bx-edit.svg' %}" alt=""></button>
-                                                {% endif %}
+                                                {% endif %} -->
                                                 <div class="flex flex-row gap-3">
                                                     <div class="text-[12px]"><span class="font-bold">Grade:</span> <i class="">{{data.result.grade}}</i></div>
                                                     <span class="text-[12px] font-bold">{{data.result.grade_type}}</span>
@@ -402,9 +402,10 @@
                                             </div> 
 
                                             <div class="flex justify-between mt-4 text-[11px] font-bold">
-                                                {{reg.session}}
+                                                {{reg.session.year}}
                                                 {% if reg.session == curr_sess and reg.semester == curr_semes %}
-                                                <button class="text-red-700" onclick="handleDeletePopOut('/advisor/student/management/reg/delete/{{reg.id}}/{{student.matricNumber}}/', '{{reg.course.title}}')">Delete</button>
+                                                {% url 'stream_'|add:stream|add:':advisor_student_management_reg_delete' reg.id student.matricNumber as delete_url %}
+                                                <button class="text-red-700" onclick="handleDeletePopOut('{{ delete_url }}', '{{reg.course.title}}')">Delete</button>
                                                 {% endif %}
                                                 <span class="">{{reg.course.unit}}</span>
                                                 
@@ -417,9 +418,9 @@
 
                                             <div class="flex justify-between mt-4 text-[11px] font-bold">
                                                 {% if reg.instructor_remark != 'approved' and reg.instructor_remark != 'rejected' and reg.session == curr_sess and reg.semester == curr_semes %}
-                                                <a href="/advisor/student/reg/approved/{{reg.id}}/{{student.matricNumber}}/" class="rounded-md border-[0.5px] border-[#077105] px-[2px] py-[3px] hover:py-[2px] hover:bg-[#077105] hover:text-[#fff] text-[8px] font-semibold">Approve</a>
-
-                                                <a href="/advisor/student/reg/rejected/{{re.id}}/{{student.matricNumber}}/" class="rounded-md border-[0.5px] border-red-700 px-[2px] py-[3px] text-red-700 hover:py-[2px] hover:bg-red-700 hover:text-[#fff] text-[10px] font-semibold">Reject</a>
+                                                <a href="{% url 'stream_'|add:stream|add:':advisor_approve_reject_reg' 'approved' reg.id student.matricNumber %}" class="rounded-md border-[0.5px] border-[#077105] px-[2px] py-[3px] hover:py-[2px] hover:bg-[#077105] hover:text-[#fff] text-[8px] font-semibold">Approve</a>
+                                                
+                                                <a href="{% url 'stream_'|add:stream|add:':advisor_approve_reject_reg' 'rejected' reg.id student.matricNumber %}" class="rounded-md border-[0.5px] border-red-700 px-[2px] py-[3px] text-red-700 hover:py-[2px] hover:bg-red-700 hover:text-[#fff] text-[10px] font-semibold">Reject</a>
                                                 {% endif %}
                                             </div>
                                         </div>
@@ -454,9 +455,9 @@
                                             <p class="mt-3 text-[10px]"><span class="text-12px font-bold">Title: </span>{{data.registration.course.title}}</p>
                                             
                                             <div class="mt-3 flex flex-row justify-between items-center">
-                                                {% if data.result.grade %}
+                                                <!-- {% if data.result.grade %}
                                                 <button onclick="handleGradeUpdateModal('{{data.registration.id}}', '{{data.registration.course.title}}', '{{data.registration.course.courseCode}}')"><img class="w-[15px]" src="{% static './assets/bx-edit.svg' %}" alt=""></button>
-                                                {% endif %}
+                                                {% endif %} -->
                                                 <div class="flex flex-row gap-3">
                                                     <div class="text-[12px]"><span class="font-bold">Grade:</span> <i class="">{{data.result.grade}}</i></div>
                                                     <span class="text-[12px] font-bold">{{data.result.grade_type}}</span>
@@ -471,7 +472,8 @@
 
                                             <div class="flex justify-between mt-4 text-[11px] font-bold">
                                                 {% if data.registration.session == curr_sess and data.registration.session == curr_semes %}
-                                                <button class="text-red-700" onclick="handleDeletePopOut('/instructor/student/management/reg/delete/{{data.registration.id}}', '{{data.registration.course.title}}')">Delete</button>
+                                                {% url 'stream_'|add:stream|add:':advisor_student_management_reg_delete' reg.id student.matricNumber as delete_url %}
+                                                <button class="text-red-700" onclick="handleDeletePopOut('{{delete_url}}', '{{data.registration.course.title}}')">Delete</button>
                                                 {% endif %}
                                                 <span class="">{{data.registration.course.unit}}</span>
                                             </div>
@@ -483,9 +485,9 @@
 
                                             <div class="flex justify-between mt-4 text-[11px] font-bold">
                                                 {% if data.registration.instructor_remark != 'approved' and data.registration.instructor_remark != 'rejected' and data.registration.session == curr_sess and data.registration.semester == curr_semes %}
-                                                <a href="/instructor/student/reg/approved/{{data.registration.id}}" class="rounded-md border-[0.5px] border-[#077105] px-[2px] py-[3px] hover:py-[2px] hover:bg-[#077105] hover:text-[#fff] text-[8px] font-semibold">Approve</a>
+                                                <a href="{% url 'stream_'|add:stream|add:':advisor_approve_reject_reg' 'approved' reg.id student.matricNumber %}" class="rounded-md border-[0.5px] border-[#077105] px-[2px] py-[3px] hover:py-[2px] hover:bg-[#077105] hover:text-[#fff] text-[8px] font-semibold">Approve</a>
 
-                                                <a href="/instructor/student/reg/rejected/{{data.registration.id}}" class="rounded-md border-[0.5px] border-red-700 px-[2px] py-[3px] text-red-700 hover:py-[2px] hover:bg-red-700 hover:text-[#fff] text-[10px] font-semibold">Reject</a>
+                                                <a href="{% url 'stream_'|add:stream|add:':advisor_approve_reject_reg' 'rejected' reg.id student.matricNumber %}" class="rounded-md border-[0.5px] border-red-700 px-[2px] py-[3px] text-red-700 hover:py-[2px] hover:bg-red-700 hover:text-[#fff] text-[10px] font-semibold">Reject</a>
                                                 {% endif %}
                                             </div>
                                         </div>
@@ -525,10 +527,9 @@
 
     <div class="background_wrapper"></div>
     
-
-
+    {% url 'stream_'|add:stream|add:':advisor_student_management_reg_add' student.matricNumber as add_url %}
     <div class="create_programme">
-        <form method="get" action="/instructor/student/management/reg/add/{{matricNo}}/">
+        <form method="get" action="{{add_url}}">
           <!-- {% csrf_token %} -->
 
           <h4 class="mb-8 text-[23px] ml-5 text-red-700">ADD Course</h1>
@@ -542,11 +543,11 @@
 
 
           <select name="curr_session" id="">
-            <option value="{{curr_sess}}" class="">{{curr_sess}}</option>
+            <option value="{{curr_sess.year}}" class="">{{curr_sess}}</option>
           </select>
 
           <select name="curr_semester" id="">
-            <option value="{{curr_semes}}" class="">{{curr_semes}} Semester</option>
+            <option value="{{curr_semes.name}}" class="">{{curr_semes}} Semester</option>
           </select>
          
   

@@ -33,6 +33,7 @@ from django.urls import reverse
 from django.utils.encoding import force_bytes, force_str
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.contrib.sites.shortcuts import get_current_site
+from urllib.parse import urlencode
 
 from .models import *
 
@@ -826,160 +827,80 @@ def AdvisorDashboard(request):
             },
         )
 
-login_required
+def get_student_data(students, session, semester):
+    """Helper function to build student data with approved and pending course counts."""
+    student_data = []
+    for student in students:
+        registrations = Registration.objects.filter(
+            student=student,
+            session=session,
+            semester=semester,
+        )
+        approved_count = registrations.filter(instructor_remark="approved").count()
+        pending_count = registrations.filter(instructor_remark="pending").count()
+
+        
+        student_data.append({
+            "student": student,
+            "approved_courses": approved_count,
+            "pending_courses": pending_count,
+        })
+    return student_data
+
+@login_required
 @user_passes_test(is_advisor, login_url="/404")
 def StudentList(request):
-    if request.user.is_authenticated:
-        user = request.user
-        advisor = get_object_or_404(LevelAdvisor, user=user)
+    user = request.user
+    advisor = get_object_or_404(LevelAdvisor, user=user)
 
-        if user.stream != "a":
-            # Redirect to the correct stream's dashboard
-            if user.stream == "b":
-                messages.info(request, "You have been redirected to your Stream B dashboard.")
-                return redirect("stream_b:advisor_dashboard")
-            else:
-                messages.error(request, "Invalid stream for this user.")
-                return redirect("/login/")
+    if user.stream != "a":
+        if user.stream == "b":
+            messages.info(request, "You have been redirected to your Stream B dashboard.")
+            return redirect("stream_b:advisor_dashboard")
+        messages.error(request, "Invalid stream for this user.")
+        return redirect("/login/")
 
-        current_session_model = Session.objects.filter(is_current=True).first()
-        print("current session", current_session_model)
-        current_semester_model = Semester.objects.filter(is_current=True).first()
-        courses = Course.objects.all()
+    current_session_model = Session.objects.filter(is_current=True).first()
+    current_semester_model = Semester.objects.filter(is_current=True).first()
 
-        if request.method == "POST":
-            matricNo = request.POST["matricNo"].strip()
-            if matricNo != "":
-                try:
-                    student = (
-                        Student.objects.all()
-                        .filter(
-                            Q(matricNumber=matricNo) | Q(jambNumber=matricNo),
-                            department=advisor.department,
-                            currentLevel=advisor.level,
-                            currentSession=current_session_model,
-                            
-                        )
-                        .first()
-                    )
+    context = {
+        "curr_sess": current_session_model,
+        "curr_semes": current_semester_model,
+        "stream": user.stream,
+    }
 
-                    if student:
-                        student_data = []
+    if request.method == "POST":
+        matricNo = request.POST.get("matricNo", "").strip()
+        if matricNo:
+            try:
+                student = (
+                    Student.objects.filter(
+                        Q(matricNumber=matricNo) | Q(jambNumber=matricNo),
+                        department=advisor.department,
+                        currentLevel=advisor.level,
+                        currentSession=current_session_model,
+                    ).first()
+                )
+                if student:
+                    student_data = get_student_data([student], current_session_model, current_semester_model)
+                    context["student_data"] = student_data
+                    return render(request, "levelAdvisor/student.html", context)
+                else:
+                    messages.error(request, f"Student not found!")
+            except Exception as e:
+                messages.error(request, f"An error occurred: {str(e)}")
+        else:
+            messages.error(request, "Matric number cannot be empty!")
+        return redirect("stream_a:advisor_students")
 
-                        registrations = Registration.objects.filter(
-                            student=student,
-                            session=current_session_model,
-                            semester=current_semester_model,
-                        )
-                        approved_count = registrations.filter(
-                            instructor_remark="approved"
-                        ).count()
-                        pending_count = registrations.filter(
-                            instructor_remark="pending"
-                        ).count()
-
-                        # Append the data
-                        student_data.append(
-                            {
-                                "student": student,
-                                "approved_courses": approved_count,
-                                "pending_courses": pending_count,
-                            }
-                        )
-
-                        return render(
-                            request,
-                            "levelAdvisor/student.html",
-                            {
-                                "student_data": student_data,
-                                "curr_sess": current_session_model,
-                                "curr_semes": current_semester_model,
-                                "stream": user.stream,
-                            },
-                        )
-                    else:
-                        messages.error(request, f"Student not found!")
-                        return redirect("stream_a:advisor_students")
-                except Exception as e:
-                    messages.error(request, f"An error occurred: {str(e)}")
-                    return redirect("stream_a:advisor_students")
-
-        students = Student.objects.filter(
-            department=advisor.department,
-            currentLevel=advisor.level,
-            currentSession=current_session_model,
-            user__stream=advisor.user.stream,
-        )
-
-        student_data = []
-
-        for student in students:
-            # Get the registrations for the current session and semester
-            registrations = Registration.objects.filter(
-                student=student,
-                session=current_session_model,
-                semester=current_semester_model,
-            )
-            approved_count = registrations.filter(instructor_remark="approved").count()
-            pending_count = registrations.filter(instructor_remark="pending").count()
-
-            # Append the data
-            student_data.append(
-                {
-                    "student": student,
-                    "approved_courses": approved_count,
-                    "pending_courses": pending_count,
-                }
-            )
-
-        return render(
-            request,
-            "levelAdvisor/student.html",
-            {
-                "student_data": student_data,
-                "curr_sess": current_session_model,
-                "curr_semes": current_semester_model,
-                "stream": user.stream,
-            },
-        )
-
-        students = Student.objects.filter(
-            department=advisor.department,
-            currentLevel=advisor.level,
-            currentSession=current_session_model,
-            user__stream=advisor.user.stream,
-        )
-
-        student_data = []
-        for student in students:
-            # Get the registrations for the current session and semester
-            registrations = Registration.objects.filter(
-                student=student,
-                session=current_session_model,
-                semester=current_semester_model,
-            )
-            approved_count = registrations.filter(instructor_remark="approved").count()
-            pending_count = registrations.filter(instructor_remark="pending").count()
-
-            # Append the data
-            student_data.append(
-                {
-                    "student": student,
-                    "approved_courses": approved_count,
-                    "pending_courses": pending_count,
-                }
-            )
-
-        return render(
-            request,
-            "levelAdvisor/student.html",
-            {
-                "student_data": student_data,
-                "curr_sess": current_session_model,
-                "curr_semes": current_semester_model,
-            },
-        )
-
+    students = Student.objects.filter(
+        department=advisor.department,
+        currentLevel=advisor.level,
+        currentSession=current_session_model,
+        user__stream=advisor.user.stream,
+    )
+    context["student_data"] = get_student_data(students, current_session_model, current_semester_model)
+    return render(request, "levelAdvisor/student.html", context)
 
 @login_required
 @user_passes_test(is_advisor, login_url="/404")
@@ -1075,3 +996,196 @@ def AdvisorReg(request):
     )
 
 
+
+@login_required
+@user_passes_test(is_advisor, login_url="/404")
+def AdvisorDeleteStudentRegisteredCourse(request, id, matricNo):
+    if request.user.is_authenticated:
+        user = request.user
+        advisor = get_object_or_404(LevelAdvisor, user=user)
+        if user.stream != "a":
+            # Redirect to the correct stream's dashboard
+            if user.stream == "b":
+                messages.info(request, "You have been redirected to your Stream B dashboard.")
+                return redirect("stream_b:advisor_dashboard")
+            else:
+                messages.error(request, "Invalid stream for this user.")
+                return redirect("/login/")
+
+        current_session_model = Session.objects.filter(is_current=True).first()
+        current_semester_model = Semester.objects.filter(is_current=True).first()
+    try:
+        student = get_object_or_404(Student, matricNumber=matricNo, department=advisor.department)
+                
+        regObjects = get_object_or_404(Registration, id=id, student=student)
+        
+        if (
+            regObjects.session == current_session_model
+            and regObjects.semester == current_semester_model
+            and regObjects.instructor_remark != "approved"
+        ):
+            if Registration.objects.all().filter(id=id).exists():
+                messages.info(
+                    request, f"{regObjects.course.title} deleted successfully"
+                )
+                regObjects = Registration.objects.filter(id=id).delete()
+
+                return redirect(f"{reverse('stream_a:advisor_reg')}?q={matricNo}")
+            messages.info(request, f"Registered Course not available")
+            return redirect(f"{reverse('stream_a:advisor_reg')}?q={matricNo}")
+        messages.info(request, f"Cannot perform Opereation")
+        return redirect(f"{reverse('stream_a:advisor_reg')}?q={matricNo}")
+    except:
+        messages.info(request, f"Registered Course not available")
+        return redirect(f"{reverse('stream_a:advisor_reg')}?q={matricNo}")
+
+
+@login_required
+@user_passes_test(is_advisor, login_url="/404")
+def AdvisorAddCourseStudentRegisteredCourse(request, matricNo):
+    user = request.user
+    advisor = get_object_or_404(LevelAdvisor, user=user)
+
+    if user.stream != "a":
+        if user.stream == "b":
+            messages.info(request, "You have been redirected to your Stream B dashboard.")
+            return redirect("stream_b:advisor_dashboard")
+        messages.error(request, "Invalid stream for this user.")
+        return redirect("/login/")
+
+    # Validate query parameters
+    courseId = request.GET.get("course")
+    curr_session = request.GET.get("curr_session")
+    curr_semester = request.GET.get("curr_semester")
+
+    if not all([courseId, curr_session, curr_semester]):
+        messages.error(request, "Missing required parameters: course, session, or semester.")
+        return redirect(f"{reverse('stream_a:advisor_reg')}?q={matricNo}")
+
+    # Get current session and semester
+    current_session_model = Session.objects.filter(is_current=True).first()
+    current_semester_model = Semester.objects.filter(is_current=True).first()
+
+    if not current_session_model or not current_semester_model:
+        messages.error(request, "Current session or semester not set.")
+        return redirect(f"{reverse('stream_a:advisor_reg')}?q={matricNo}")
+
+    # Find student
+    student = (
+        Student.objects.filter(
+            Q(matricNumber=matricNo) | Q(jambNumber=matricNo),
+            department=advisor.department,
+            user__stream=user.stream,
+        ).first()
+    )
+
+    if not student:
+        messages.info(request, f"Student does not exist")
+        return redirect(f"{reverse('stream_a:advisor_reg')}?q={matricNo}")
+
+    # Check session and semester
+    if (
+        curr_session != current_session_model.year
+        or curr_semester != current_semester_model.name
+    ):
+        
+        messages.info(request, f"Session or semester does not match current values.")
+        return redirect(f"{reverse('stream_a:advisor_reg')}?q={matricNo}")
+
+    # Get course
+    course = get_object_or_404(Course, id=courseId)
+
+    # Validate course semester
+    if course.semester.name != current_semester_model.name:
+        messages.info(request, f"Invalid course for the current semester.")
+        return redirect(f"{reverse('stream_a:advisor_reg')}?q={matricNo}")
+
+    # Check if already registered
+    if Registration.objects.filter(
+        student=student,
+        course=course,
+        session=current_session_model,
+        semester=current_semester_model,
+    ).exists():
+        messages.info(request, f"Course already registered.")
+        return redirect(f"{reverse('stream_a:advisor_reg')}?q={matricNo}")
+
+    # Create registration
+    Registration.objects.create(
+        student=student,
+        course=course,
+        session=current_session_model,
+        semester=current_semester_model,
+    )
+    messages.success(request, f"Course {course.title} added successfully.")
+    return redirect(f"{reverse('stream_a:advisor_reg')}?q={matricNo}")
+
+@login_required
+@user_passes_test(is_advisor, login_url="/404")
+def AdvisorApproveRejectReg(request, stats, id, matricNo):
+    if request.user.is_authenticated:
+        user = request.user
+        advisor = get_object_or_404(LevelAdvisor, user=user)
+        if user.stream != "a":
+            # Redirect to the correct stream's dashboard
+            if user.stream == "b":
+                messages.info(request, "You have been redirected to your Stream B dashboard.")
+                return redirect("stream_b:advisor_dashboard")
+            else:
+                messages.error(request, "Invalid stream for this user.")
+                return redirect("/login/")
+        current_session_model = Session.objects.filter(is_current=True).first()
+        current_semester_model = Semester.objects.filter(is_current=True).first()
+
+        try:
+            if stats == "approved" or stats == "rejected":
+                reg = Registration.objects.filter(id=id).first()
+                if (
+                    reg.session == current_session_model
+                    and reg.semester == current_semester_model
+                ):
+                    reg.instructor_remark = stats
+                    reg.save()
+                    messages.info(request, f"Registered Course {stats}!!")
+                    return redirect(f"{reverse('stream_a:advisor_reg')}?q={matricNo}")
+                else:
+                    messages.info(request, f"Request not allowed")
+                    return redirect(f"{reverse('stream_a:advisor_reg')}?q={matricNo}")
+            else:
+                messages.info(request, f"Invalid request")
+                return redirect(f"{reverse('stream_a:advisor_reg')}?q={matricNo}")
+        except:
+            messages.info(request, f"Registered Course not available")
+            return redirect(f"{reverse('stream_a:advisor_reg')}?q={matricNo}")
+    return render(request, "advisor/studentManagement.html")
+
+
+def get_latest_failed_or_pending_courses(student):
+    # Step 1: Get the current semester and session
+    try:
+        current_semester = Semester.objects.get(is_current=True)
+        current_session = Session.objects.get(is_current=True)
+    except ObjectDoesNotExist as e:
+        raise ValueError("Ensure both the current semester and session are set.") from e
+
+    # Step 2: Filter all registrations for the student
+    registrations = Registration.objects.filter(student=student)
+
+    # Step 3: Annotate courses with the latest registration date
+    annotated_courses = registrations.annotate(
+        latest_registration_date=Max("registration_date")
+    )
+
+    # Step 4: Filter for courses with the latest registration date
+    latest_registrations = annotated_courses.filter(
+        registration_date=F("latest_registration_date")
+    )
+
+    # Step 5: Filter pending or failed courses that are not in the current semester or session
+    filtered_courses = latest_registrations.filter(
+        Q(grade_remark__in=["pending", "failed"]),
+        #     ~Q(semester=current_semester),
+        #     ~Q(session=current_session)
+    )
+
+    return filtered_courses

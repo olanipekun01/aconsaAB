@@ -70,7 +70,7 @@
                   {% if carryover %}
                     {% for co in carryover %}
                       <tr>
-                        <td class='tbodytrtd '><input type="hidden" name="courses" value="{{ co.course.id }}"/><input type="checkbox" checked disabled data-unit="3" name='courses' value="{{course.id}}" class="course-checkbox"/></td>
+                        <td class='tbodytrtd '><input type="hidden" name="courses" value="{{ co.course.id }}"/><input type="checkbox" checked disabled data-unit="{{co.course.unit}}" name='courses' value="{{course.id}}" class="course-checkbox"/></td>
                         <td class="border border-gray-200 p-2">{{co.course.courseCode}}</td>
                         <td class="border border-gray-200 p-2">{{co.course.title}}</td>
                         <td class="border border-gray-200 p-2">{{co.course.unit}}</td>
@@ -81,7 +81,7 @@
                   {% endif %}
                 {% for course in courses %}
                 <tr>
-                  <td class='tbodytrtd '><input type="checkbox" data-unit="3" name='courses' value="{{course.id}}" class="course-checkbox"/></td>
+                  <td class='tbodytrtd '><input type="checkbox" data-unit="{{course.unit}}" name='courses' value="{{course.id}}" class="course-checkbox"/></td>
                   <td class="border border-gray-200 p-2">{{course.courseCode}}</td>
                   <td class="border border-gray-200 p-2">{{course.title}}</td>
                   <td class="border border-gray-200 p-2">{{course.unit}}</td>

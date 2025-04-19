@@ -233,7 +233,7 @@
             <div>
                 <span>Current Academic Session: {{sess}} ||</span>
                 <span>{{semes}} Semester  ||</span>
-                <a href="/accounts/logout/">Logout</a>
+                <a href="{% url 'common:logout' %}">Logout</a>
             </div>
             
         </div>
@@ -336,7 +336,7 @@
                               <td class="px-4 py-2">{{pend.matricNumber}}</td>
                               <td class="px-4 py-2">{{pend.programme}}</td>
                               <td class="px-4 py-2">
-                                <span class="px-2 py-1 text-xs font-semibold bg-yellow-200 text-yellow-800 rounded"><a href="{% url 'stream_'|add:stream|add:':advisor_reg' pend.matricNumber %}">view</a></span>
+                                <span class="px-2 py-1 text-xs font-semibold bg-yellow-200 text-yellow-800 rounded"><a href="{% url 'stream_'|add:stream|add:':advisor_reg' %}?q={{pend.matricNumber}}">view</a></span>
                               </td>
                             
                             </tr>

@@ -21,6 +21,11 @@ from django.urls import re_path
 from django.views.static import serve
 from django.shortcuts import render
 
+
+from django.conf.urls.static import static
+
+from django.conf.urls import handler404
+
 def custom_404_view(request, exception):
     return render(request, '404.html', status=404)
 
@@ -32,6 +37,9 @@ urlpatterns = [
     path('stream_a/', include('stream_a.urls')),
     path('stream_b/', include('stream_b.urls')),
     # Add instructor and advisor apps later if seperated
+
 ]
 
+if settings.DEBUG:
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
