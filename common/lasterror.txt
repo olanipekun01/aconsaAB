@@ -1,0 +1,25 @@
+
+getting this error "AttributeError at /instructor/dashboard/
+module 'stream_a.models' has no attribute 'Instructor'
+Request Method:	GET
+Request URL:	http://localhost:8000/instructor/dashboard/
+Django Version:	3.2.25
+Exception Type:	AttributeError
+Exception Value:	
+module 'stream_a.models' has no attribute 'Instructor'
+Exception Location:	C:\Users\AU_Corporate Affairs\Desktop\projects\auo\build\aconsaAB\common\views.py, line 151, in adminDashboard
+Python Executable:	C:\Users\AU_Corporate Affairs\AppData\Local\Programs\Python\Python37-32\python.exe
+Python Version:	3.7.0
+Python Path:	
+['C:\\Users\\AU_Corporate Affairs\\Desktop\\projects\\auo\\build\\aconsaAB',
+ 'C:\\Users\\AU_Corporate '
+ 'Affairs\\AppData\\Local\\Programs\\Python\\Python37-32\\python37.zip',
+ 'C:\\Users\\AU_Corporate '
+ 'Affairs\\AppData\\Local\\Programs\\Python\\Python37-32\\DLLs',
+ 'C:\\Users\\AU_Corporate '
+ 'Affairs\\AppData\\Local\\Programs\\Python\\Python37-32\\lib',
+ 'C:\\Users\\AU_Corporate '
+ 'Affairs\\AppData\\Local\\Programs\\Python\\Python37-32',
+ 'C:\\Users\\AU_Corporate '
+ 'Affairs\\AppData\\Local\\Programs\\Python\\Python37-32\\lib\\site-packages']
+Server time:	Sun, 20 Apr 2025 16:55:51 +0000"

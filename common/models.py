@@ -97,7 +97,13 @@ class Instructor(models.Model):
     phoneNumber = models.CharField(blank=True, null=True, max_length=15)
     departmental_email = models.CharField(blank=True, null=True, max_length=90)
     passport = models.ImageField(upload_to="images/", default='images/placeholder.png', null=True, blank=True)
-
+    preferred_stream = models.CharField(
+        max_length=1,
+        choices=[("a", "Stream A"), ("b", "Stream B")],
+        default="a",
+        help_text="The stream the instructor prefers to view."
+    )
+    
     def __str__(self):
         return self.name
 

@@ -206,7 +206,7 @@
 
         <div>
             <div class="text-[12px] text-[#ffffff] flex flex-row gap-1">
-                <a class="border-r border-white border-solid px-2 hover:text-[#000000] hover:underline" href="./index.html">Home</a>
+                <a class="border-r border-white border-solid px-2 hover:text-[#000000] hover:underline" href="/instructor/dashboard">Home</a>
                 <a href="https://achieversnursingcollegeakure.edu.ng/" class="border-r border-white border-solid px-2 hover:text-[#000000] hover:underline">Official Website</a>
                 <span class="cursor-pointer hover:text-[#000000] hover:underline">Hot Line: </span>
             </div>
@@ -220,7 +220,7 @@
     <main>
         <div class='bg-[#000000] text-white text-[17px] py-2 px-[10px] lg:px-[30px] flex flex-row justify-between'>
             <div class>
-                <span>Student Control Center</span>
+                <span>Admin Control Center <i class="text-red-700">STREAM {{stream | upper}}</i></span>
             </div>
 
             <div>
@@ -233,7 +233,7 @@
         
         <div class="flex flex-row gap-[10px]">
             <div class="w-[250px] mt-[20px]">
-                <h3 class="bg-[#000000] text-white text-[17px] py-2 px-[10px] lg:px-[10px]">.: Control Menu</h3>
+                <h3 class="bg-[#000000] text-white text-[17px] py-2 px-[10px] lg:px-[10px]">.: Control Menu <i class="text-red-700">STREAM {{stream | upper}}</i></h3>
                 <div class="pt-4 px-2 flex flex-col gap-3">
                     <div class="flex flex-row gap-2 align-center">
                         <img src="{% static './assets/bxs-right-arrow.svg' %}" alt="">
@@ -274,7 +274,7 @@
 
             <div class='w-[68%]'>
                 <div class='mt-[20px] bg-[#000000] flex flex-row justify-between  text-white text-[17px] py-2 px-[10px] lg:px-[30px] flex flex-row gap-2 items-center'>
-                    <span class="uppercase">.: {{departs}} --- {{level}} </span>
+                    <span class="uppercase">.: STREAM {{stream | upper}} <i class="text-red-700">{{departs}} --- {{level}}</i> </span>
 
                     <div class="features flex flex-row gap-8">
                         {% comment %} <div class="">
@@ -282,12 +282,7 @@
                             <button onclick="handleCreateModal()" class="">+ Create</button>
                         </div> {% endcomment %}
 
-                        <div class="">
-                            <form action="" class="">
-                                <input type="text" class="">
-                                <button>Search</button>
-                            </form>
-                        </div>
+                        
                     </div>
 
                     
