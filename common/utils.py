@@ -217,7 +217,7 @@ def generate_pdf(reg_course, student, session, semester, confirmReg, gpa):
 
     pdf.set_font("times", "", 11)
     pdf.set_text_color(0, 0, 0)
-    pdf.cell(60, 7, f"70-Above (A), 60-69")
+    pdf.cell(60, 7, f"70-Above (A), 60-69 ")
 
     return pdf
 
