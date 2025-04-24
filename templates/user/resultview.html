@@ -22,7 +22,7 @@
                 </svg>
                 Back
               </button>
-              <form action="/result/view/" method="post">
+              <form action="{% url 'stream_'|add:stream|add:':result_view' %}" method="post">
                 {% csrf_token %}
                 <input type="text" hidden value="{{semester}}" name="semes">
                 <input type="text" hidden value="{{session}}" name="sess">
@@ -33,7 +33,7 @@
             <!-- Title -->
             <div class="mt-6">
               <h1 class="text-2xl font-bold text-purple-700">Examination Result</h1>
-              <p class="text-gray-500">{{session}} Academic Session - {% if semester == 'first' %} Harmattan {% else %} Rain {% endif %} Semester</p>
+              <p class="text-gray-500">{{session}} Academic Session - {% if semester == 'first' %} First {% else %} Second {% endif %} Semester</p>
             </div>
         
             <!-- Summary Cards -->

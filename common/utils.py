@@ -201,7 +201,23 @@ def generate_pdf(reg_course, student, session, semester, confirmReg, gpa):
     pdf.cell(15, 4, f"{unit}", border=1)
     pdf.cell(15, 4, f"GPA", border=1)
     pdf.cell(15, 4, f"{gpa}", border=1)
-    pdf.ln()
+    pdf.ln(16)
+
+    pdf.set_font("times", "BU", 12)
+    pdf.set_text_color(0, 0, 0)
+    pdf.cell(20, 7, f"LEGEND:")
+
+    
+
+    pdf.set_font("times", "B", 11)
+    pdf.set_text_color(0, 0, 0)
+    pdf.cell(60, 7, f"Class of Grade")
+
+    pdf.ln(6)
+
+    pdf.set_font("times", "", 11)
+    pdf.set_text_color(0, 0, 0)
+    pdf.cell(60, 7, f"70-Above (A), 60-69")
 
     return pdf
 

@@ -1147,7 +1147,6 @@ def registeredStudentManagementDashboard(request):
         if request.method == "POST":
             matricNo = request.POST["matricNo"].lower().strip()
 
-            
             if matricNo != "":
                 try:
                     student = (
@@ -1239,12 +1238,16 @@ def registeredStudentManagementDashboard(request):
                                 "stream": activeStream,
                             },
                         )
+                    else:
+                        messages.info(request, f"Student not registered!")
+                        redirect(f"/instructor/student/management/")
                 except Exception as e:
                     messages.info(request, f"Student not available {e}")
                     return redirect(f"/instructor/student/management/")
-
-            messages.info(request, f"Field cannot be empty!")
-            redirect(f"/instructor/student/management/")
+            else:
+                messages.info(request, f"Field cannot be empty!")
+                redirect(f"/instructor/student/management/")
+    messages.info(request, f"Search for student above with matric No!")
     return render(
         request,
         "admin/student_dashboard.html",
@@ -1602,3 +1605,27 @@ def manageAddStudent(request):
                 return redirect("/instructor/add_student/")
 
         return render(request, "admin/add_student.html", {"stream": activeStream})
+    
+@login_required
+@user_passes_test(is_instructor, login_url="/404")
+def switchStream(request):
+    if request.user.is_authenticated:
+        user = request.user
+        instructor = get_object_or_404(Instructor, user=user)
+
+        activeStream = instructor.preferred_stream
+        if activeStream == "":
+            messages.error(request, 'Stream is not set')
+            redirect("/404")
+        Models = ModelA if activeStream == "a" else ModelB
+
+        if request.method == "POST" and "switch_stream" in request.POST:
+            new_stream = request.POST.get("stream")
+            if new_stream in ["a", "b"]:
+                instructor.preferred_stream = new_stream
+                instructor.save()
+                stream = new_stream
+                messages.success(request, f"Switched to Stream {new_stream.upper()}")
+                return redirect("/instructor/dashboard/")
+    
+    return redirect("/instructor/dashboard/")
