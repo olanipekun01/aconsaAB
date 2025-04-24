@@ -17,6 +17,10 @@ from django.db.models import Sum, Min
 import csv
 from datetime import datetime
 import os
+import uuid
+import random
+import string
+import json
 
 
 def is_student(user):
@@ -860,6 +864,7 @@ def DownloadStudentCourse(request):
             sess = request.POST["session_year"]
             semes = request.POST["semester_name"]
 
+            print('id', id)
             course = get_object_or_404(Models.Course, id=id)
             sess = get_object_or_404(Models.Session, year=sess)
             semes = get_object_or_404(Models.Semester, name=semes)

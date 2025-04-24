@@ -297,13 +297,21 @@
                                 <input type="text" value="{{course_id}}" hidden name='course_id'>
                                 <input type="text" value="{{down_sess.year}}" hidden name='session_year'>
                                 <input type="text" value="{{down_semes.name}}" hidden name='semester_name'>
-                                <button class="">+ download</button>
+                                {% if course_id %}
+                                    <button class="">+ download</button>
+                                {% else %}
+                                    <button disabled class="">+ download</button>
+                                {% endif %}
                             </form>
                         </div>
 
                         <div class="">
                             <img src="" alt="" class="">
+                            {% if course_id %}
                             <button onclick="handleEachResultModal('{{course.courseCode}}')" class="">+ upload result</button>
+                            {% else %}
+                            <button disabled onclick="handleEachResultModal('{{course.courseCode}}')" class="">+ upload result</button>
+                            {% endif %}
                         </div>
                     </div>
 
