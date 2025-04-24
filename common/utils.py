@@ -207,7 +207,7 @@ def generate_pdf(reg_course, student, session, semester, confirmReg, gpa):
     pdf.set_text_color(0, 0, 0)
     pdf.cell(20, 7, f"LEGEND:")
 
-    
+    pdf.ln(6)
 
     pdf.set_font("times", "B", 11)
     pdf.set_text_color(0, 0, 0)
@@ -217,7 +217,7 @@ def generate_pdf(reg_course, student, session, semester, confirmReg, gpa):
 
     pdf.set_font("times", "", 11)
     pdf.set_text_color(0, 0, 0)
-    pdf.cell(60, 7, f"70-Above (A), 60-69 ")
+    pdf.cell(60, 7, f"70-Above (A), 60-69 (B), 50-59 (C), 45-49 (D), below 50 for nursing and life sciences courses, and below 45 for other classes (F).")
 
     return pdf
 
