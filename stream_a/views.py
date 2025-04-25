@@ -102,7 +102,7 @@ def Courses(request):
             courses = request.POST.getlist("courses")
             # sess = request.POST["sess"]
             # semes = request.POST["semes"]
-            totalUnit = request.POST["totalUnit"]
+            totalUnit = request.POST["totalUnit", 0]
             # Filter registrations for the student, session, and semester
             registrations = Registration.objects.filter(
                 student=student,
@@ -137,9 +137,7 @@ def Courses(request):
                     )
                     course_exist.save()
 
-                # Default to 0 if no units are found
-
-                print(f"Total units registered: {total_units}")
+                
 
                 confirm_reg, created = confirmRegister.objects.get_or_create(
                     student=student,
