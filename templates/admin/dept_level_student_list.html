@@ -12,15 +12,23 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <style type="text/tailwindcss">
         .create_programme, .update_programme {
-            background-color: #C3C4CE;
-            padding: 20px 20px;
-            width: 550px;
-            height: 400px;
+            position: fixed; /* Fix to viewport */
+            top: 50%; /* Center vertically */
+            left: 50%; /* Center horizontally */
+            transform: translate(-50%, -50%); /* Offset by half its size */
+            background-color: #C3C4CE; /* Gray background */
+            padding: 20px;
             border-radius: 20px;
-            display: none;
-            position: absolute;
-            top: 120px;
-            left: 520px;
+            display: none; /* Hidden by default */
+            width: auto; /* Adapt to content */
+            min-width: 300px; /* Minimum width */
+            max-width: 90vw; /* Max 90% of viewport width */
+            height: auto; /* Adapt to content */
+            min-height: 200px; /* Minimum height */
+            max-height: 90vh; /* Max 90% of viewport height */
+            overflow-y: auto; /* Scroll if content overflows */
+            z-index: 1001; /* Above background */
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow */
         }
 
         
@@ -122,12 +130,18 @@
         .deletePopOut {
             background-color: #C3C4CE;
             padding: 20px 20px;
-            width: 350px;
+            min-width: 350px;
+            width: auto;
+            height: auto; /* Adapt to content */
             border-radius: 20px;
             display: none;
-            position: absolute;
-            top: 240px;
-            left: 520px;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            overflow-y: auto;
+            z-index: 1001;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
 
 
@@ -182,14 +196,15 @@
         }
 
         .background_wrapper {
-            position: absolute;
+            position: fixed; /* Fix to viewport */
             left: 0;
             top: 0;
-            width: 100%;
-            height: 110%;
-            background: rgb(4, 134, 70, 0.5);
-            backdrop-filter: blur(5px);
-            display: none;
+            width: 100vw; /* Full viewport width */
+            height: 100vh; /* Full viewport height */
+            background: rgba(4, 134, 70, 0.5); /* Semi-transparent green */
+            backdrop-filter: blur(5px); /* Blur effect */
+            display: none; /* Hidden by default */
+            z-index: 1000; /* Ensure it’s above other content */
         }
 
     </style>
@@ -226,7 +241,7 @@
             <div>
                 <span>Current Academic Session: {{sess}} ||</span>
                 <span>{{semes}} Semester  ||</span>
-                <a href="/accounts/logout/">Logout</a>
+                <a href="/logout/">Logout</a>
             </div>
             
         </div>
@@ -286,6 +301,19 @@
                     </div>
 
                     
+                </div>
+
+                <div class="flex flex-row mb-4">
+                    <form method="post" action="/instructor/switch/stream/" class="mt-4 flex gap-2 items-center">
+                        {% csrf_token %}
+                        <input type="hidden" name="switch_stream" value="1">
+                        <label for="stream" class="text-sm font-medium">Select Stream:</label>
+                        <select name="stream" id="stream" class="border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-[#064b25]" onchange="this.form.submit()">
+                            <option value="a" {% if stream == "a" %}selected{% endif %}>Stream A</option>
+                            <option value="b" {% if stream == "b" %}selected{% endif %}>Stream B</option>
+                        </select>
+                        <button type="submit" class="bg-[#064b25] text-white py-2 px-6 rounded-lg hover:bg-[#05391d] font-semibold">Switch Stream</button>
+                    </form>
                 </div>
 
                 {% for message in messages %}

@@ -41,6 +41,8 @@ from urllib.parse import urlencode
 
 from .models import *
 
+from common.utils import *
+
 UserModel = get_user_model()
 
 
@@ -205,9 +207,7 @@ def Courses(request):
                     )
                     course_exist.save()
 
-                # Default to 0 if no units are found
-
-                print(f"Total units registered: {total_units}")
+                
 
                 confirm_reg, created = confirmRegister.objects.get_or_create(
                     student=student,

@@ -46,7 +46,7 @@
             <div>
                 <span>Current Academic Session: {{sess}} ||</span>
                 <span>{{semes}} Semester  ||</span>
-                <a href="/accounts/logout">Logout</a>
+                <a href="/logout">Logout</a>
             </div>
             
         </div>
@@ -97,7 +97,20 @@
                     <span class="uppercase">.: STREAM {{stream | upper}} <i class="text-red-700">Dashboard</i></span>
                     
                 </div>
+                <div class="flex flex-row mb-4">
+                    <form method="post" action="/instructor/switch/stream/" class="mt-4 flex gap-2 items-center">
+                        {% csrf_token %}
+                        <input type="hidden" name="switch_stream" value="1">
+                        <label for="stream" class="text-sm font-medium">Select Stream:</label>
+                        <select name="stream" id="stream" class="border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-[#064b25]" onchange="this.form.submit()">
+                            <option value="a" {% if stream == "a" %}selected{% endif %}>Stream A</option>
+                            <option value="b" {% if stream == "b" %}selected{% endif %}>Stream B</option>
+                        </select>
+                        <button type="submit" class="bg-[#064b25] text-white py-2 px-6 rounded-lg hover:bg-[#05391d] font-semibold">Switch Stream</button>
+                    </form>
+                </div>
                 <div class='mt-1 border-[1px] border-[#000] px-[30px] py-[10px]'>
+                    
                     <div class="flex flex-row gap-8">
                             <div class="w-[120px] flex flex-col gap-4 bg-[#000000] text-white rounded-lg px-4 py-3 items-center">
                                 <span class="">Programs</span>

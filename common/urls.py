@@ -61,6 +61,8 @@ urlpatterns = [
     path('instructor/student/reg/<str:stats>/<str:id>/', views.ApproveRejectReg, name='approve_reject_reg'),
     
     path('instructor/student/grade/', views.studentGradeUpdate, name='instructor_student_grade_update'),
+
+    path('instructor/switch/stream/', views.switchStream, name='switch_stream'),
     
     
     re_path(r'^media/(?P<path>.*)$', serve,{'document_root': settings.MEDIA_ROOT}),
