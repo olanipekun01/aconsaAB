@@ -159,13 +159,13 @@ def Courses(request):
                             grade_remark="passed"
                         ).exists()
                     ]
-                    Registration.objects.get_or_create(
-                        student=student,
-                        course=course,
-                        session=current_session,
-                        semester=current_semester,
-                        defaults={"instructor_remark": "pending"}
-                    )
+                    # Registration.objects.get_or_create(
+                    #     student=student,
+                    #     course=course,
+                    #     session=current_session_model,
+                    #     semester=current_semester_model,
+                    #     defaults={"instructor_remark": "pending"}
+                    # )
                     messages.error(
                         request,
                         f"Cannot register {course.title}: Missing prerequisites: {', '.join(missing_prereqs)}."
@@ -179,6 +179,7 @@ def Courses(request):
                 student=student,
                 session=current_session_model,
                 semester=current_semester_model,
+                instructor_remark__in=["approved", "pending"]
             )
 
             
@@ -193,7 +194,7 @@ def Courses(request):
 
             total_units = total_units + new_units
 
-            if total_units <= 5:
+            if total_units <= 20:
                 for id in courses:
 
                     course = (get_object_or_404(Course, id=id),)
@@ -231,8 +232,6 @@ def Courses(request):
             return redirect("stream_a:courses")
 
         level = get_object_or_404(Level, name=student.currentLevel)
-        current_session_model = Session.objects.filter(is_current=True).first()
-        current_semester_model = Semester.objects.filter(is_current=True).first()
         try:
             current_semester_model = Semester.objects.get(is_current=True)
         except ObjectDoesNotExist:
@@ -247,7 +246,7 @@ def Courses(request):
             current_session_model = Session.objects.get(is_current=True)
         except ObjectDoesNotExist:
             messages.error(
-                request, "No current semester is set. Please set one as current."
+                request, "No current session is set. Please set one as current."
             )
             return redirect("stream_a:courses")
 
@@ -261,6 +260,7 @@ def Courses(request):
             student=student,
             semester=current_semester_model,
             session=current_session_model,  # Ensure this is the current academic session
+            instructor_remark__in=["approved", "pending"],
         ).values_list("course", flat=True)
 
         courses = courses.exclude(id__in=registered_courses)
@@ -272,41 +272,8 @@ def Courses(request):
             course for course in courses if not has_prerequisites_passed(student, course)
         ]
 
-        # Step 1: Retrieve the current session and semester
-        current_session = Session.objects.filter(is_current=True).first()
-        current_semester = Semester.objects.filter(is_current=True).first()
+        
 
-        if not current_session or not current_semester:
-            messages.error(
-                request, "No current semester is set. Please set one as current."
-            )
-            return redirect("stream_a:courses")
-
-        # registrations = Registration.objects.filter(student=student)
-
-        # # Step 2: Filter registrations not in the current session AND current semester
-        # registrations = registrations.filter(
-        #     ~Q(session=current_session) & Q(semester=current_semester)
-        # )
-
-        # # Debugging: Print the filtered registrations
-        # print("Registrations not in current session and semester:", registrations)
-
-        # annotated_courses = registrations.annotate(latest_registration_date=Max('registration_date'))
-        # print('annotated_courses', annotated_courses)
-
-        # # Step 3: Filter only the latest registrations
-        # carryover_courses_unique = annotated_courses.filter(
-        #     registration_date=F('latest_registration_date')
-        # )
-
-        latest_attempts = (
-            Result.objects.filter(
-                registration__student=student  # Filter by the specific student
-            )
-            .values("registration_id")
-            .annotate(highest_attempt=Max("attempt_number"))
-        )
 
         
 
@@ -327,71 +294,73 @@ def Courses(request):
             for attempt in latest_attempts
         ]
 
-        # if conditions:
-        #     failed_results = Result.objects.filter(
-        #         reduce(lambda x, y: x | y, conditions),  # Combine conditions with OR
-        #         grade_remark__in=["failed", "pending"],
-        #     )
-            
-        #     # print("Failed Results:", list(failed_results))
-        # else:
-        #     failed_results = Result.objects.none()  # No conditions mean no results
-
         failed_results = Result.objects.filter(
             reduce(or_, conditions) if conditions else Q(),
             grade_remark__in=["failed", "pending"]
         ) if conditions else Result.objects.none()
-
-        # Extract failed registration IDs
         failed_registration_ids = list(failed_results.values_list("registration_id", flat=True))
+
 
         # Step 1: Filter all registrations for the student
         registrations = Registration.objects.filter(student=student)
 
         # Step 2: Identify courses registered in the current session
         courses_in_current_session = registrations.filter(
-            session=current_session
+            session=current_session_model,
+            semester=current_semester_model,
+            instructor_remark__in=["approved", "pending"]
         ).values_list("course_id", flat=True)
 
         # Step 3: Filter registrations not in the current session, but in the current semester,
         # and exclude any course that has been registered in the current session
-        registrations = registrations.filter(
+        carryover_registrations = registrations.filter(
             ~Q(
                 course_id__in=courses_in_current_session
             ),  # Exclude courses registered in current session
-            semester=current_semester,  # Include only courses in current semester
+            semester=current_semester_model,  # Include only courses in current semester
         )
 
-        registrations = registrations.filter(
+        # carryover_registrations = registrations.filter(
+           
+        #     ~Q(course_id__in=courses_in_current_session),
+        #     id__in=failed_registration_ids,
+        #     semester=current_semester_model,  # Exclude current session registrations
+        # )
+
+        registrations = carryover_registrations.filter(
             id__in=failed_results.values_list("registration_id", flat=True),
             student=student,  # Additional filter for the same student
         )
 
-        # Debugging: Print the filtered registrations
-        # print("Registrations not in current session but in current semester:", registrations)
-
-        
+               
 
         carryover_registrations = registrations.filter(
             ~Q(course_id__in=courses_in_current_session),
-            semester=current_semester,
+            semester=current_semester_model,
             id__in=failed_results.values_list("registration_id", flat=True)
         )
 
+        print("zee", carryover_registrations)
+
         prereq_carryovers = Registration.objects.filter(
             student=student,
-            session=current_session,
-            semester=current_semester,
+            session=current_session_model,
+            semester=current_semester_model,
             instructor_remark="pending"
-        ).exclude(id__in=registered_courses)
+        ).exclude(id__in=courses_in_current_session)
 
         compulsory_carryovers = Registration.objects.filter(
             student=student,
-            session=current_session,
-            semester=current_semester,
+            session=current_session_model,
+            semester=current_semester_model,
             course__status="compulsory",
             instructor_remark="pending"
-        ).exclude(id__in=registered_courses)
+        ).exclude(id__in=courses_in_current_session)
+
+        
+        
+
+        
 
 
         # # Step 4: Annotate to get the latest registration date for each course
@@ -409,20 +378,22 @@ def Courses(request):
         )
 
         # Step 5: Filter only the latest registrations
-        # carryover_courses_unique = annotated_courses.filter(
-        #     registration_date=F("latest_registration_date")
-        # )
+        carryover_courses_unique = annotated_courses.filter(
+            registration_date=F("latest_registration_date")
+        )
+
+        print("zeee", carryover_courses_unique)
 
         # carryover_courses_unique = (carryover_registrations | prereq_carryovers).distinct()
-        carryover_courses_unique = (carryover_registrations | prereq_carryovers | compulsory_carryovers).distinct()
+        # carryover_courses_unique = (carryover_registrations).distinct()
 
         
 
     
 
-        registrations = Registration.objects.filter(student=student).select_related(
-            "session"
-        )
+        # registrations = Registration.objects.filter(student=student).select_related(
+        #     "session"
+        # )
 
         enrollment = (
             Enrollment.objects.filter(student=student).order_by("enrolled_date").first()

@@ -44,6 +44,8 @@ INSTALLED_APPS = [
     'common',
     'stream_a',
     'stream_b',
+    # 'stream_a.apps.StreamAConfig',
+    # 'stream_b.apps.StreamBConfig',
 ]
 
 MIDDLEWARE = [
