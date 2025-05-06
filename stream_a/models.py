@@ -115,6 +115,7 @@ class Course(models.Model):
     programme = models.ManyToManyField(Programme, related_name='courses')
     level = models.ForeignKey(Level, on_delete=models.CASCADE)
     semester = models.ForeignKey(Semester, on_delete=models.CASCADE, null=True)
+    prerequisites = models.ManyToManyField("self", blank=True, symmetrical=False)
 
     def __str__(self):
         return f"{self.courseCode} (Stream A)"

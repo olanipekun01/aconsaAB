@@ -47,3 +47,40 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 document.getElementById("current-date").innerText = new Date().toDateString();
+
+
+function updateTotalUnits() {
+    let total = 0;
+    document.querySelectorAll('input.course-checkbox:checked').forEach(checkbox => {
+        total += parseInt(checkbox.getAttribute('data-unit'));
+    });
+    document.getElementById('totalUnit').value = total;
+}
+
+function toggleDependentCourses() {
+    // Reset all checkboxes to enabled
+    document.querySelectorAll('input.course-checkbox').forEach(checkbox => {
+        checkbox.disabled = false;
+    });
+
+    // Disable dependent courses for each selected prerequisite
+    document.querySelectorAll('input.course-checkbox:checked').forEach(checked => {
+        const courseId = checked.value;
+        // Find courses that list this course as a prerequisite
+        document.querySelectorAll(`tr[data-prereq-ids*="${courseId}"]`).forEach(row => {
+            const checkbox = row.querySelector('input.course-checkbox');
+            if (checkbox) {
+                checkbox.disabled = true;
+                checkbox.checked = false; // Uncheck if previously selected
+            };
+        });
+    });
+
+    // Update total units after disabling
+    updateTotalUnits();
+}
+
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', () => {
+    toggleDependentCourses();
+});

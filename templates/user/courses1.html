@@ -1,7 +1,6 @@
 {% extends 'base.html' %}
 {% load custom_tags %}
 {% load custom_filters %}
-{% load static course_tags %}
 
 
 {% load static %}
@@ -78,43 +77,18 @@
                         <td class="border border-gray-200 p-2">{{co.course.unit}}</td>
                         <td class="border border-gray-200 p-2">{{semes}} Semester</td>
                         <td class="border border-gray-200 p-2">C</td>
-                        <td class="border-b p-2 text-left"></td>
                       </tr>
                     {% endfor %}
                   {% endif %}
                 {% for course in courses %}
-                <tr data-course-id="{{ course.id }}" data-prereq-ids="{% for prereq in course.prerequisites.all %}{{ prereq.id }}{% if not forloop.last %},{% endif %}{% endfor %}">
-                    <td class="border-b p-2">
-                        <input type="checkbox" name="courses" value="{{ course.id }}"
-                               class="course-checkbox" data-unit="{{ course.unit }}"
-                               onchange="updateTotalUnits(); toggleDependentCourses();">
-                    </td>
-                  <!-- <td class='tbodytrtd '><input type="checkbox" data-unit="{{course.unit}}" name='courses' value="{{course.id}}" class="course-checkbox"/></td> -->
+                <tr>
+                  <td class='tbodytrtd '><input type="checkbox" data-unit="{{course.unit}}" name='courses' value="{{course.id}}" class="course-checkbox"/></td>
                   <td class="border border-gray-200 p-2">{{course.courseCode}}</td>
                   <td class="border border-gray-200 p-2">{{course.title}}</td>
                   <td class="border border-gray-200 p-2">{{course.unit}}</td>
                   <td class="border border-gray-200 p-2">{{semes}} Semester</td>
                   <td class="border border-gray-200 p-2">{{course.status}}</td>
-                  <td class="border-b p-2">
-                    {% if course.prerequisites.all %}
-                        {% for prereq in course.prerequisites.all %}
-                            {{ prereq.title }}
-                            {% if prereq|has_passed:student %}
-                                <span class="text-green-600">(Passed)</span>
-                            {% else %}
-                                <span class="text-red-600">(Not Passed)</span>
-                            {% endif %}
-                            {% if not forloop.last %}, {% endif %}
-                        {% endfor %}
-                    {% else %}
-                        None
-                    {% endif %}
-                </td>
                 </tr>
-                {% empty %}
-                    <tr>
-                        <td colspan="6" class="border-b p-2 text-center">No available courses. Complete prerequisites or carryovers.</td>
-                    </tr>
                 {% endfor %}
               </tbody>
             </table>
@@ -125,85 +99,8 @@
         </form>
         </section>
 
-
-        <h4 class="mt-4 font-bold">Unavailable Courses (Prerequisites Not Met)</h4>
-        <table class="w-full mt-4 border-collapse">
-            <thead>
-                <tr class="bg-gray-200">
-                    <th class="border-b p-2 text-left">Code</th>
-                    <th class="border-b p-2 text-left">Title</th>
-                    <th class="border-b p-2 text-left">Level</th>
-                    <th class="border-b p-2 text-left">Unit</th>
-                    <th class="border-b p-2 text-left">Missing Prerequisites</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for course in unavailable_courses %}
-                    <tr>
-                        <td class="border-b p-2">{{ course.code }}</td>
-                        <td class="border-b p-2">{{ course.title }}</td>
-                        <td class="border-b p-2">{{ course.level.name }}</td>
-                        <td class="border-b p-2">{{ course.unit }}</td>
-                        <td class="border-b p-2">
-                            {% for prereq in course.prerequisites.all %}
-                                {% if not prereq|has_passed:student %}
-                                    {{ prereq.title }}
-                                    {% if not forloop.last %}, {% endif %}
-                                {% endif %}
-                            {% endfor %}
-                        </td>
-                    </tr>
-                {% empty %}
-                    <tr>
-                        <td colspan="5" class="border-b p-2 text-center">No unavailable courses.</td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-
-
-        <h4 class="mt-4 font-bold">Carryover Courses</h4>
-        <table class="w-full mt-4 border-collapse">
-            <thead>
-                <tr class="bg-gray-200">
-                    <th class="border-b p-2 text-left">Code</th>
-                    <th class="border-b p-2 text-left">Title</th>
-                    <th class="border-b p-2 text-left">Level</th>
-                    <th class="border-b p-2 text-left">Unit</th>
-                    <th class="border-b p-2 text-left">Compulsory</th>
-                    <th class="border-b p-2 text-left">Reason</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for reg in carryover %}
-                    <tr>
-                        <td class="border-b p-2">{{ reg.course.courseCode }}</td>
-                        <td class="border-b p-2">{{ reg.course.title }}</td>
-                        <td class="border-b p-2">{{ reg.course.level.name }}</td>
-                        <td class="border-b p-2">{{ reg.course.unit }}</td>
-                        <td class="border-b p-2">{{ reg.course.is_compulsory|yesno:"Yes,No" }}</td>
-                        <td class="border-b p-2">
-                            {% if reg.id in failed_registration_ids %}
-                                Failed/Pending
-                            {% elif reg.course.is_compulsory and not reg.course|has_passed:student %}
-                                Compulsory Not Registered
-                            {% else %}
-                                Missing Prerequisites
-                            {% endif %}
-                        </td>
-                    </tr>
-                {% empty %}
-                    <tr>
-                        <td colspan="5" class="border-b p-2 text-center">No carryover courses.</td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-
        
       </div>
-
-
 
     
     

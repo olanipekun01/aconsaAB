@@ -25,6 +25,10 @@ from django.db import transaction
 from django.db.models import (
     Max, Q, F, Sum, Min, OuterRef, Subquery
 )
+
+from operator import or_
+from functools import reduce
+
 from django.forms.models import model_to_dict
 from django.http import HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
@@ -75,6 +79,33 @@ def Dashboard(request):
 
     return render(request, "user/dashboard.html", {"student": student, "stream": user.stream})
 
+def has_prerequisites_passed(student, course, checked_courses=None):
+    """Recursively check if all prerequisites for a course are passed."""
+    if checked_courses is None:
+        checked_courses = set()
+    if course.id in checked_courses:
+        return True
+    checked_courses.add(course.id)
+    for prereq in course.prerequisites.all():
+        has_passed = Result.objects.filter(
+            registration__student=student,
+            registration__course=prereq,
+            grade_remark="passed"
+        ).exists()
+        if not has_passed or not has_prerequisites_passed(student, prereq, checked_courses):
+            return False
+    return True
+
+def get_dependent_courses(course, all_courses, dependents=None):
+    """Recursively find all courses that depend on the given course."""
+    if dependents is None:
+        dependents = set()
+    for c in all_courses:
+        if course in c.prerequisites.all() and c.id not in dependents:
+            dependents.add(c.id)
+            get_dependent_courses(c, all_courses, dependents)
+    return dependents
+
 @login_required
 @user_passes_test(is_student, login_url="/404")
 def Courses(request):
@@ -98,9 +129,49 @@ def Courses(request):
 
         if request.method == "POST":
             courses = request.POST.getlist("courses")
-            # sess = request.POST["sess"]
-            # semes = request.POST["semes"]
             totalUnit = request.POST["totalUnit"]
+            new_courses = Course.objects.filter(id__in=courses)
+            new_units = new_courses.aggregate(total_units=Sum("unit"))["total_units"] or 0
+
+            # Check for prerequisite-dependent course conflicts
+            all_courses = Course.objects.all()
+            for course in new_courses:
+                dependent_ids = get_dependent_courses(course, all_courses)
+                conflicting_courses = new_courses.filter(id__in=dependent_ids)
+                if conflicting_courses.exists():
+                    conflicting_titles = ", ".join(c.title for c in conflicting_courses)
+                    messages.error(
+                        request,
+                        f"Cannot register {course.title} with its dependent courses: {conflicting_titles}."
+                    )
+                    return redirect("stream_a:courses")
+
+            # Check prerequisites and register carryovers
+            for course in new_courses:
+                if not has_prerequisites_passed(student, course):
+                    missing_prereqs = [
+                        prereq.title for prereq in course.prerequisites.all()
+                        if not Result.objects.filter(
+                            registration__student=student,
+                            registration__course=prereq,
+                            grade_remark="passed"
+                        ).exists()
+                    ]
+                    Registration.objects.get_or_create(
+                        student=student,
+                        course=course,
+                        session=current_session,
+                        semester=current_semester,
+                        defaults={"instructor_remark": "pending"}
+                    )
+                    messages.error(
+                        request,
+                        f"Cannot register {course.title}: Missing prerequisites: {', '.join(missing_prereqs)}."
+                    )
+                    return redirect("stream_a:courses")
+
+
+
             # Filter registrations for the student, session, and semester
             registrations = Registration.objects.filter(
                 student=student,
@@ -108,8 +179,7 @@ def Courses(request):
                 semester=current_semester_model,
             )
 
-            new_courses = Course.objects.filter(id__in=courses)
-            new_units = new_courses.aggregate(total_units=Sum("unit"))["total_units"] or 0
+            
 
             # Aggregate the total units by summing the 'unit' field of related courses
             total_units = registrations.aggregate(total_units=Sum("course__unit"))[
@@ -195,6 +265,13 @@ def Courses(request):
 
         courses = courses.exclude(id__in=registered_courses)
 
+        available_courses = [
+            course for course in courses if has_prerequisites_passed(student, course)
+        ]
+        unavailable_courses = [
+            course for course in courses if not has_prerequisites_passed(student, course)
+        ]
+
         # Step 1: Retrieve the current session and semester
         current_session = Session.objects.filter(is_current=True).first()
         current_semester = Semester.objects.filter(is_current=True).first()
@@ -231,26 +308,7 @@ def Courses(request):
             .annotate(highest_attempt=Max("attempt_number"))
         )
 
-        # print('latests', latest_attempts)
-
-        # Step 2: Filter results with the highest attempt where the grade remark is not 'passed'
-        # failed_results = Result.objects.filter(
-        #     Q(attempt_number__in=[attempt['highest_attempt'] for attempt in latest_attempts]),
-        #     registration__student=student,  # Ensure we only consider the same student
-        #     grade_remark__in=['failed', 'pending']
-        # )
-
-        # failed_results = Result.objects.filter(
-        #     Q(
-        #         *[
-        #             Q(registration_id=attempt['registration_id'], attempt_number=attempt['highest_attempt'])
-        #             for attempt in latest_attempts
-        #         ]
-        #     ),
-        #     grade_remark__in=['failed', 'pending']  # Filter for failed or pending results
-        # )
-
-        # print('results', failed_results)
+        
 
         # Step 1: Verify latest attempts
         latest_attempts = (
@@ -258,7 +316,7 @@ def Courses(request):
             .values("registration_id")
             .annotate(highest_attempt=Max("attempt_number"))
         )
-        # print("Latest Attempts:", list(latest_attempts))
+        
 
         # Step 2: Construct the query for failed results
         conditions = [
@@ -269,17 +327,23 @@ def Courses(request):
             for attempt in latest_attempts
         ]
 
-        if conditions:
-            failed_results = Result.objects.filter(
-                reduce(lambda x, y: x | y, conditions),  # Combine conditions with OR
-                grade_remark__in=["failed", "pending"],
-            )
-            # print("Failed Results:", list(failed_results))
-        else:
-            failed_results = Result.objects.none()  # No conditions mean no results
+        # if conditions:
+        #     failed_results = Result.objects.filter(
+        #         reduce(lambda x, y: x | y, conditions),  # Combine conditions with OR
+        #         grade_remark__in=["failed", "pending"],
+        #     )
+            
+        #     # print("Failed Results:", list(failed_results))
+        # else:
+        #     failed_results = Result.objects.none()  # No conditions mean no results
 
-        # Final debug print
-        # print("Final Failed Results:", failed_results)
+        failed_results = Result.objects.filter(
+            reduce(or_, conditions) if conditions else Q(),
+            grade_remark__in=["failed", "pending"]
+        ) if conditions else Result.objects.none()
+
+        # Extract failed registration IDs
+        failed_registration_ids = list(failed_results.values_list("registration_id", flat=True))
 
         # Step 1: Filter all registrations for the student
         registrations = Registration.objects.filter(student=student)
@@ -306,21 +370,55 @@ def Courses(request):
         # Debugging: Print the filtered registrations
         # print("Registrations not in current session but in current semester:", registrations)
 
+        
+
+        carryover_registrations = registrations.filter(
+            ~Q(course_id__in=courses_in_current_session),
+            semester=current_semester,
+            id__in=failed_results.values_list("registration_id", flat=True)
+        )
+
+        prereq_carryovers = Registration.objects.filter(
+            student=student,
+            session=current_session,
+            semester=current_semester,
+            instructor_remark="pending"
+        ).exclude(id__in=registered_courses)
+
+        compulsory_carryovers = Registration.objects.filter(
+            student=student,
+            session=current_session,
+            semester=current_semester,
+            course__status="compulsory",
+            instructor_remark="pending"
+        ).exclude(id__in=registered_courses)
+
+
+        # # Step 4: Annotate to get the latest registration date for each course
+        # annotated_courses = registrations.annotate(
+        #     latest_registration_date=Max("registration_date")
+        # )
+
         # Step 4: Annotate to get the latest registration date for each course
-        annotated_courses = registrations.annotate(
+        annotated_courses = carryover_registrations.annotate(
             latest_registration_date=Max("registration_date")
         )
-        # print('Annotated courses:', annotated_courses)
 
-        # Step 5: Filter only the latest registrations
-        carryover_courses_unique = annotated_courses.filter(
+        annotated_courses= annotated_courses.filter(
             registration_date=F("latest_registration_date")
         )
 
-        # Debugging: Print final carryover courses
-        # print("Final Carryover Courses:", carryover_courses_unique)
+        # Step 5: Filter only the latest registrations
+        # carryover_courses_unique = annotated_courses.filter(
+        #     registration_date=F("latest_registration_date")
+        # )
 
-        # print('latest_registrations', carryover_courses_unique)
+        # carryover_courses_unique = (carryover_registrations | prereq_carryovers).distinct()
+        carryover_courses_unique = (carryover_registrations | prereq_carryovers | compulsory_carryovers).distinct()
+
+        
+
+    
 
         registrations = Registration.objects.filter(student=student).select_related(
             "session"
@@ -332,6 +430,8 @@ def Courses(request):
 
         enrollment_year = int(enrollment.session.year.split("/")[0])
 
+
+    
         # Calculate level for each session
         sessions_and_levels = []
         for registration in registrations:
@@ -349,6 +449,13 @@ def Courses(request):
                 }
             )
 
+        # cObjects = Course.objects.filter(department=student.department)
+        # course_levels = sorted(set(x.level.name for x in cObjects))
+        # confirmReg = confirmRegister.objects.filter(student=student)
+        # unique_sessions = sorted(set(entry["session"] for entry in sessions_and_levels))
+        # unique_levels = sorted(set(entry["level"] for entry in sessions_and_levels))
+        # duration = len(unique_levels) if len(unique_levels) == len(unique_sessions) else 0
+
         cObjects = Course.objects.all().filter(department=student.department)
         course_levels = []
         for x in cObjects:
@@ -363,7 +470,6 @@ def Courses(request):
 
         unique_levels = sorted({entry["level"] for entry in sessions_and_levels})
 
-        # courses = Course.objects.all()
 
         duration = 0
         if len(unique_levels) == len(unique_sessions):
@@ -374,6 +480,7 @@ def Courses(request):
             "user/courses.html",
             {
                 "courses": courses,
+                "unavailable_courses": unavailable_courses,
                 "student": student,
                 "sess": current_session_model,
                 "semes": current_semester_model,
@@ -384,7 +491,10 @@ def Courses(request):
                 "duration": duration,
                 "confirmReg": confirmReg,
                 "stream": user.stream,
+                "failed_results": failed_results,
+                "failed_registration_ids": failed_registration_ids
             },
+            
         )
 
     # return render(request, "user/courses.html", {"student": 'student'})
