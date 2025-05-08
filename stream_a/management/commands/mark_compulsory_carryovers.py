@@ -2,8 +2,11 @@
 
 from django.core.management.base import BaseCommand
 from django.db.models import Q
-from stream_a.models import Student, Course, Registration, Session, Semester
-from common.models import Department, CustomUser
+from stream_a.models import Student, Course, Registration, Session, Semester, confirmRegister, Level, Department
+from common.models import  CustomUser
+from django.shortcuts import render, redirect, get_object_or_404
+from datetime import datetime
+from django.utils.timezone import now
 
 class Command(BaseCommand):
     help = 'Marks unregistered compulsory courses as carryovers at the end of the session'
@@ -19,13 +22,16 @@ class Command(BaseCommand):
         students = Student.objects.filter(currentSession=current_session)
 
         for student in students:
+            print("students", student)
             # Get compulsory courses for the student's level, programme, and semesters
             compulsory_courses = Course.objects.filter(
-                level__name=student.currentLevel,
+                level=student.currentLevel,
                 programme=student.programme,
                 semester__in=semesters,
-                status="compulsory"
+                status="C"
             )
+
+            print("compulsory courses", compulsory_courses)
 
             for course in compulsory_courses:
                 # Check if the course was registered in the current session
@@ -48,19 +54,19 @@ class Command(BaseCommand):
 
                     confirm_reg, created = confirmRegister.objects.get_or_create(
                         student=student,
-                        session=current_session_model,
-                        semester=current_semester_model,
+                        session=current_session,
+                        semester=course.semester,
                         level=get_object_or_404(Level, name=student.currentLevel),
                     )
 
                     if not created:
                         # Update the total units and registration date if the instance already exists
-                        confirm_reg.totalUnits = total_units
+                        confirm_reg.totalUnits = course.unit
                         confirm_reg.registration_date = now().date()
                         confirm_reg.save()
                     else:
                         # If a new instance was created, set the totalUnits and save
-                        confirm_reg.totalUnits = total_units
+                        confirm_reg.totalUnits = course.unit
                         confirm_reg.save()
 
                     self.stdout.write(

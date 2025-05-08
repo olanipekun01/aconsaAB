@@ -83,11 +83,10 @@
                     {% endfor %}
                   {% endif %}
                 {% for course in courses %}
-                <tr data-course-id="{{ course.id }}" data-prereq-ids="{% for prereq in course.prerequisites.all %}{{ prereq.id }}{% if not forloop.last %},{% endif %}{% endfor %}">
+                <tr >
                     <td class="border-b p-2">
                         <input type="checkbox" name="courses" value="{{ course.id }}"
-                               class="course-checkbox" data-unit="{{ course.unit }}"
-                               onchange="updateTotalUnits(); toggleDependentCourses();">
+                               class="course-checkbox" data-unit="{{ course.unit }}">
                     </td>
                   <!-- <td class='tbodytrtd '><input type="checkbox" data-unit="{{course.unit}}" name='courses' value="{{course.id}}" class="course-checkbox"/></td> -->
                   <td class="border border-gray-200 p-2">{{course.courseCode}}</td>
@@ -140,7 +139,7 @@
             <tbody>
                 {% for course in unavailable_courses %}
                     <tr>
-                        <td class="border-b p-2">{{ course.code }}</td>
+                        <td class="border-b p-2">{{ course.courseCode }}</td>
                         <td class="border-b p-2">{{ course.title }}</td>
                         <td class="border-b p-2">{{ course.level.name }}</td>
                         <td class="border-b p-2">{{ course.unit }}</td>
@@ -185,11 +184,14 @@
                         <td class="border-b p-2">
                             {% if reg.id in failed_registration_ids %}
                                 Failed/Pending
-                            {% elif reg.course.is_compulsory and not reg.course|has_passed:student %}
+                            {% comment %} {% elif reg.course.is_compulsory and not reg.course|has_passed:student %}
                                 Compulsory Not Registered
                             {% else %}
                                 Missing Prerequisites
-                            {% endif %}
+                            {% endif %} {% endcomment %}
+                            {% else %}
+                                Compulsory carryover
+                            {% endif %} 
                         </td>
                     </tr>
                 {% empty %}
