@@ -445,7 +445,32 @@ def Courses(request):
 
         carryover_courses_unique = (carryover_registrations | compulsory_carryovers).distinct()
 
+        # Combine carryover_registrations and compulsory_carryovers
+        combined_carryovers = (carryover_registrations | compulsory_carryovers)
 
+        # Debug: Print combined carryovers
+        print("Combined Carryovers:", list(combined_carryovers.values("course__title", "course__courseCode", "session__year", "id")))
+
+        # Get the latest registration per course based on session__year
+        latest_registrations = combined_carryovers.values("course_id").annotate(
+            max_session_year=Max("session__year")
+        ).values("course_id", "max_session_year")
+
+        # Debug: Print latest registrations per course
+        print("Latest Registrations:", list(latest_registrations))
+
+        # Filter to keep only the latest registration per course
+        carryover_courses_unique = combined_carryovers.filter(
+            course_id__in=Subquery(
+                latest_registrations.values("course_id")
+            ),
+            session__year__in=Subquery(
+                latest_registrations.values("max_session_year")
+            )
+        ).distinct()
+
+        # Debug: Print final unique carryovers
+        print("Carryover Courses Unique:", list(carryover_courses_unique.values("course__title", "course__courseCode", "session__year", "id")))
 
         # # Step 4: Annotate to get the latest registration date for each course
         # annotated_courses = registrations.annotate(
