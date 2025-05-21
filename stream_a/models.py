@@ -146,7 +146,7 @@ class Registration(models.Model):
     session = models.ForeignKey(Session, on_delete=models.CASCADE,  null=True, default=None)
     semester = models.ForeignKey(Semester, on_delete=models.CASCADE,  null=True, default=None)
     instructor_remark = models.CharField(max_length=50, choices=INSTRUCTOR_REMARK_CHOICES, null=True, default='pending')
-    registration_date = models.DateField(auto_now_add=True)
+    registration_date = models.DateTimeField(default=now)
 
     def __str__(self):
         return f"{self.id} - {self.student.surname} - {self.course} ({self.session}, {self.semester})"

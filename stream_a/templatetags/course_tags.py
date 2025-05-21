@@ -5,10 +5,6 @@ register = template.Library()
 
 @register.filter
 def has_passed(course, student):
-    """
-    Check if the student has passed the given course.
-    Returns True if a Result exists with grade_remark='passed', False otherwise.
-    """
     if not isinstance(course, Course) or not isinstance(student, Student):
         return False
     return Result.objects.filter(
