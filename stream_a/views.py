@@ -274,8 +274,7 @@ def Courses(request):
 
         
 
-
-        
+    
 
         # Step 1: Verify latest attempts
         latest_attempts = (
