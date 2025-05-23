@@ -258,8 +258,15 @@ def Courses(request):
             session=current_session_model,  # Ensure this is the current academic session
             instructor_remark__in=["approved", "pending"],
         ).values_list("course_id", flat=True)
+        
+        previously_registered_courses = Registration.objects.filter(
+            student=student
+        ).values_list("course_id", flat=True)
 
-        courses = courses.exclude(id__in=registered_courses)
+
+        courses = courses.exclude(id__in=registered_courses).exclude(
+            id__in=previously_registered_courses
+        )
 
         available_courses = [
             course for course in courses if has_prerequisites_passed(student, course)
@@ -317,31 +324,51 @@ def Courses(request):
         )
 
         # Step 5: Get latest registration per course using datetime
-        latest_registrations = carryover_registrations.values("course_id").annotate(
-            latest_registration_date=Max("registration_date")
-        ).values("course_id", "latest_registration_date")
+        # latest_registrations = carryover_registrations.values("course_id").annotate(
+        #     latest_registration_date=Max("registration_date")
+        # ).values("course_id", "latest_registration_date")
+
+        
 
         # carryover_registrations = registrations.filter(
         #     ~Q(course_id__in=courses_in_current_session),
         #     id__in=Subquery(
         #         carryover_registrations.filter(
         #             course_id=OuterRef("course_id"),
-        #             registration_date=OuterRef("latest_registration_date"),
         #             id__in=failed_registration_ids
         #         ).order_by("-registration_date").values("id")[:1]
         #     ),
         #     semester=current_semester_model
         # ).distinct()
 
+        latest_registrations = registrations.filter(
+            ~Q(course_id__in=courses_in_current_session),
+            semester=current_semester_model,
+            
+        ).values("course_id").annotate(
+            latest_registration_id=Subquery(
+                registrations.filter(
+                    ~Q(course_id__in=courses_in_current_session),
+                    course_id=OuterRef("course_id"),
+                    semester=current_semester_model,
+                    
+                ).order_by("-registration_date", "-id").values("id")[:1]
+            )
+        ).values("course_id", "latest_registration_id")
+
+        # Step 4: Filter carryover registrations where latest result is not passed
         carryover_registrations = registrations.filter(
             ~Q(course_id__in=courses_in_current_session),
+            id__in=Subquery(latest_registrations.values("latest_registration_id")),
+            semester=current_semester_model,
+            
+        ).exclude(
             id__in=Subquery(
-                carryover_registrations.filter(
-                    course_id=OuterRef("course_id"),
-                    id__in=failed_registration_ids
-                ).order_by("-registration_date").values("id")[:1]
-            ),
-            semester=current_semester_model
+                Result.objects.filter(
+                    registration_id=OuterRef("id"),
+                    grade_remark="passed"
+                ).values("registration_id")
+            )
         ).distinct()
 
        
@@ -383,8 +410,7 @@ def Courses(request):
             student=student,
             session__year__lt=current_session_model.year,
             semester=current_semester_model,
-            course__status="compulsory",
-            instructor_remark="pending",
+            course__status="C",
             course__in=[course for course in Course.objects.all() if has_prerequisites_passed(student, course)],
             
         )
@@ -395,7 +421,6 @@ def Courses(request):
             session__year__lt=current_session_model.year,
             semester=current_semester_model,
             course__status="C",
-            instructor_remark="pending",
             # course__in=Course.objects.filter(
             #     id__in=Subquery(
             #         Result.objects.filter(
@@ -437,7 +462,7 @@ def Courses(request):
 
 
         # Debug: Print final carryovers
-        print("Compulsory Carryovers:", list(compulsory_carryovers.values("course__title", "registration_date")))
+        print("Compulsory Carryovers:", list(compulsory_carryovers))
 
         print("carryover registration", carryover_registrations)
 
@@ -470,7 +495,7 @@ def Courses(request):
         ).distinct()
 
         # Debug: Print final unique carryovers
-        print("Carryover Courses Unique:", list(carryover_courses_unique.values("course__title", "course__courseCode", "session__year", "id")))
+        # print("Carryover Courses Unique:", list(carryover_courses_unique.values("course__title", "course__courseCode", "session__year", "id")))
 
         # # Step 4: Annotate to get the latest registration date for each course
         # annotated_courses = registrations.annotate(
