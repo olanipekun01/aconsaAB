@@ -315,31 +315,9 @@ def Courses(request):
             instructor_remark__in=["approved", "pending"]
         ).values_list("course_id", flat=True)
 
-        # Step 3: Filter registrations not in the current session, but in the current semester,
-        # and exclude any course that has been registered in the current session
-        carryover_registrations = registrations.filter(
-            ~Q(course_id__in=courses_in_current_session),
-            id__in=failed_registration_ids,
-            semester=current_semester_model
-        )
-
-        # Step 5: Get latest registration per course using datetime
-        # latest_registrations = carryover_registrations.values("course_id").annotate(
-        #     latest_registration_date=Max("registration_date")
-        # ).values("course_id", "latest_registration_date")
+       
 
         
-
-        # carryover_registrations = registrations.filter(
-        #     ~Q(course_id__in=courses_in_current_session),
-        #     id__in=Subquery(
-        #         carryover_registrations.filter(
-        #             course_id=OuterRef("course_id"),
-        #             id__in=failed_registration_ids
-        #         ).order_by("-registration_date").values("id")[:1]
-        #     ),
-        #     semester=current_semester_model
-        # ).distinct()
 
         latest_registrations = registrations.filter(
             ~Q(course_id__in=courses_in_current_session),
@@ -356,12 +334,36 @@ def Courses(request):
             )
         ).values("course_id", "latest_registration_id")
 
+        carryover_base_registrations = registrations.filter(
+            ~Q(course_id__in=courses_in_current_session),
+            semester=current_semester_model,
+            
+        )
+        courses_with_prereqs_met = [
+            reg.course for reg in carryover_base_registrations
+            if reg.course.prerequisites.count() == 0 or has_prerequisites_passed(student, reg.course)
+        ]
+
         # Step 4: Filter carryover registrations where latest result is not passed
+        # carryover_registrations = registrations.filter(
+        #     ~Q(course_id__in=courses_in_current_session),
+        #     id__in=Subquery(latest_registrations.values("latest_registration_id")),
+        #     semester=current_semester_model,
+            
+        # ).exclude(
+        #     id__in=Subquery(
+        #         Result.objects.filter(
+        #             registration_id=OuterRef("id"),
+        #             grade_remark="passed"
+        #         ).values("registration_id")
+        #     )
+        # ).distinct()
+
         carryover_registrations = registrations.filter(
             ~Q(course_id__in=courses_in_current_session),
             id__in=Subquery(latest_registrations.values("latest_registration_id")),
             semester=current_semester_model,
-            
+            course__in=courses_with_prereqs_met
         ).exclude(
             id__in=Subquery(
                 Result.objects.filter(
@@ -372,36 +374,7 @@ def Courses(request):
         ).distinct()
 
        
-        # carryover_registrations = registrations.filter(
-        #     ~Q(course_id__in=courses_in_current_session),
-        #     id__in=failed_registration_ids,
-        #     semester=current_semester_model,
-        # )
-        # latest_dates = carryover_registrations.values("course_id").annotate(
-        #     latest_registration_date=Max("registration_date")
-        # )
-        # carryover_registrations = registrations.filter(
-        #     ~Q(course_id__in=courses_in_current_session),
-        #     course_id__in=latest_dates.values("course_id"),
-        #     registration_date__in=latest_dates.values("latest_registration_date"),
-        #     id__in=failed_registration_ids,
-        #     semester=current_semester_model
-        # )
-
-        # carryover_registrations = carryover_registrations.filter(
-        #     registration_date=F("latest_registration_date")
-        # )
-
-
-        # compulsory_carryovers = Registration.objects.filter(
-        #     student=student,
-        #     session__year__lt=current_session_model.year,  # From previous sessions
-        #     semester=current_semester_model,
-        #     course__status="compulsory",
-        #     instructor_remark="pending"
-        # ).filter(
-        #     course__in=[course for course in Course.objects.all() if has_prerequisites_passed(student, course)]
-        # ).exclude(course_id__in=courses_in_current_session)
+        
 
 
         # Step 6: Compulsory pending carryovers (only if prerequisites are now passed)
@@ -421,14 +394,6 @@ def Courses(request):
             session__year__lt=current_session_model.year,
             semester=current_semester_model,
             course__status="C",
-            # course__in=Course.objects.filter(
-            #     id__in=Subquery(
-            #         Result.objects.filter(
-            #             registration__student=student,
-            #             grade_remark="passed"
-            #         ).values("registration__course__prerequisites")
-            #     )
-            # )
         )
 
         # Filter courses by prerequisites
