@@ -85,6 +85,8 @@ class Student(models.Model):
     localGovtArea = models.CharField(blank=True, null=True, max_length=110)
     passport = models.ImageField('image', default='images/placeholder.png', null=True, blank=True)
     student_status = models.CharField(max_length=100, choices=STUDENTSTATUS_CHOICES, default='inprogress')
+    is_extra_year = models.BooleanField(default=False)
+    extra_year_count = models.PositiveIntegerField(default=0)
 
     def __str__(self):
         return f"{self.surname} - {self.matricNumber} (Stream B)"

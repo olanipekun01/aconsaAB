@@ -664,7 +664,7 @@ def adminCourseManagement(request, dept):
             courseObjects = Models.Course.objects.create(
                 title=course_title,
                 courseCode=course_code,
-                department='ACONSA Instructor',
+                department=get_object_or_404(Models.Department, id=dept),
                 unit=course_unit,
                 category=course_cat,
                 status=course_status,
@@ -673,13 +673,32 @@ def adminCourseManagement(request, dept):
             )
 
             courseObjects.save()
+            
             programmes_ids = request.POST.getlist(
                 "programmes"
             )  # Assuming departments are selected in a form
 
+            perequisite_ids = request.POST.getlist(
+                "perequisite"
+            )
+
+            if perequisite_ids and perequisite_ids != [""]:
+                valid_prerequisites = Models.Course.objects.filter(
+                    pk__in=perequisite_ids
+                ).exclude(pk=courseObjects.pk)  # Prevent self-referential prerequisite
+                if valid_prerequisites.exists():
+                    courseObjects.prerequisites.add(*valid_prerequisites)
+                    # logger.debug(f"Added prerequisites: {[c.courseCode for c in valid_prerequisites]}")
+                else:
+                    messages.warning(request, "No valid prerequisites selected.")
+            # else:
+            #     logger.debug("No prerequisites selected.")
+
             programmes = Models.Programme.objects.filter(pk__in=programmes_ids)
+
             # Add all retrieved Programme instances to the courseObjects' programmes field
             courseObjects.programme.add(*programmes)
+
             messages.info(request, "Course Added!")
             return redirect(f"/instructor/courses/{dept}")
 
@@ -692,6 +711,7 @@ def adminCourseManagement(request, dept):
             "programme": programmes,
             "department": "ACONSA Instructor",
             "deptid": dept,
+            "level": Models.Level.objects.all(),
             "streams": activeStream,
         },
     )

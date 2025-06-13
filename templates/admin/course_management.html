@@ -497,15 +497,21 @@
           </select>
 
           <select name="level" id="">
-            <option value="ND1" class="">ND1</option>
-            <option value="ND2" class="">ND2</option>
-            <option value="HND1" class="">HND1</option>
-            <option value="HND2" class="">HND2</option>
+            {% for lev in level %}
+            <option value="{{lev.name}}" class="">{{lev.name}}</option>
+            {% endfor %}
           </select>
 
           <select name="semester" id="">
             <option value="first" class="">First Semester</option>
             <option value="second" class="">Second Semester</option>
+          </select>
+
+          <select name="perequisite" id="updateperequisite">
+            <option value="" class="">no perequisite</option>
+            {% for course in courses %}
+            <option value="{{course.id}}" class="">{{course.title}}</option>
+            {% endfor %}
           </select>
 
 
@@ -606,15 +612,21 @@
 
 
           <select name="level" id="updateCourseLevelInput">
-            <option value="ND1" class="">ND1</option>
-            <option value="ND2" class="">ND2</option>
-            <option value="HND1" class="">HND1</option>
-            <option value="HND2" class="">HND2</option>
+            {% for lev in level %}
+            <option value="{{lev.name}}" class="">{{lev.name}}</option>
+            {% endfor %}
           </select>
 
           <select name="semester" id="updateCourseSemesterInput">
             <option value="first" class="">First Semester</option>
             <option value="second" class="">Second Semester</option>
+          </select>
+
+          <select name="perequisite" id="updateperequisite">
+            <option value="" class="">no perequisite</option>
+            {% for course in courses %}
+            <option value="{{course.id}}" class="">{{course.title}}</option>
+            {% endfor %}
           </select>
 
   

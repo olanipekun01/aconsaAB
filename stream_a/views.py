@@ -190,7 +190,7 @@ def Courses(request):
 
             total_units = total_units + new_units
 
-            if total_units <= 20:
+            if total_units <= 30:
                 for id in courses:
 
                     course = get_object_or_404(Course, id=id)
