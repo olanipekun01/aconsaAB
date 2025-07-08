@@ -97,7 +97,7 @@ def has_prerequisites_passed(student, course, checked_courses=None):
     for prereq in prereqs:
         has_passed = Result.objects.filter(
             registration__student=student,
-            registration__course=prereq,
+            registration__course_title=prereq.title,
             grade_remark="passed"
         ).exists()
         if not has_passed or not has_prerequisites_passed(student, prereq, checked_courses):
@@ -150,14 +150,17 @@ def Courses(request):
                         prereq.title for prereq in course.prerequisites.all()
                         if not Result.objects.filter(
                             registration__student=student,
-                            registration__course=prereq,
+                            registration__course_title=prereq.title,
                             grade_remark="passed"
                         ).exists()
                     ]
                     if course.status == "compulsory":
                         Registration.objects.get_or_create(
                             student=student,
-                            course=course,
+                            course_title=course.title,
+                            courseCode=course.courseCode,
+                            unit=course.unit,
+                            status=course.status,
                             session=current_session_model,
                             semester=current_semester_model,
                             defaults={"instructor_remark": "pending"}
@@ -181,7 +184,7 @@ def Courses(request):
             
 
             # Aggregate the total units by summing the 'unit' field of related courses
-            total_units = registrations.aggregate(total_units=Sum("course__unit"))[
+            total_units = registrations.aggregate(total_units=Sum("unit"))[
                 "total_units"
             ]
 
@@ -195,10 +198,13 @@ def Courses(request):
 
                     course = get_object_or_404(Course, id=id)
                     # Ensure course isn't already registered
-                    if not registrations.filter(course=course).exists():
+                    if not registrations.filter(course_title=course.title).exists():
                         Registration.objects.create(
                             student=student,
-                            course=course,
+                            course_title=course.title,
+                            courseCode=course.courseCode,
+                            unit=course.unit,
+                            status=course.status,
                             session=current_session_model,
                             semester=current_semester_model,
                             instructor_remark="pending"
@@ -252,20 +258,29 @@ def Courses(request):
             semester=current_semester_model,
         )
 
-        registered_courses = Registration.objects.filter(
-            student=student,
-            semester=current_semester_model,
-            session=current_session_model,  # Ensure this is the current academic session
-            instructor_remark__in=["approved", "pending"],
-        ).values_list("course_id", flat=True)
+        # registered_courses = Registration.objects.filter(
+        #     student=student,
+        #     semester=current_semester_model,
+        #     session=current_session_model,  # Ensure this is the current academic session
+        #     instructor_remark__in=["approved", "pending"],
+        # ).values_list("course_id", flat=True)
+
+        registered_courses = Course.objects.filter(
+            title__in=Registration.objects.filter(
+                student=student,
+                semester=current_semester_model,
+                session=current_session_model,
+                instructor_remark__in=["approved", "pending"],
+            ).values("course_title")
+        ).values_list("id", flat=True)
         
         previously_registered_courses = Registration.objects.filter(
             student=student
-        ).values_list("course_id", flat=True)
+        ).values_list("course_title", flat=True)
 
 
         courses = courses.exclude(id__in=registered_courses).exclude(
-            id__in=previously_registered_courses
+            title__in=previously_registered_courses
         )
 
         available_courses = [
@@ -650,7 +665,7 @@ def CourseDelete(request, id):
                 and reg.semester == current_semester_model
                 and reg.instructor_remark == "rejected"
             ):
-                messages.info(request, f"Deleted {reg.course.title}!!")
+                messages.info(request, f"Deleted {reg.course_title}!!")
 
                 reg.delete()
 
@@ -661,7 +676,7 @@ def CourseDelete(request, id):
                 )
 
                 # Aggregate the total units by summing the 'unit' field of related courses
-                total_units = registrations.aggregate(total_units=Sum("course__unit"))[
+                total_units = registrations.aggregate(total_units=Sum("unit"))[
                     "total_units"
                 ]
 
@@ -983,11 +998,11 @@ def AdvisorDashboard(request):
             instructor_remark="rejected",
         )
         
-        deptcourse = get_object_or_404(Course, courseCode=registration__courseCode)
+        course_titles = Course.objects.filter(department=advisor.department).values_list('title', flat=True)
        
 
         pending_students = Student.objects.filter(
-            registration__course__department=advisor.department,
+            registration__course_title__in=course_titles,
             registration__student__currentLevel=advisor.level,
             user__stream=advisor.user.stream,
             registration__session=current_session_model,
@@ -1207,7 +1222,7 @@ def AdvisorDeleteStudentRegisteredCourse(request, id, matricNo):
         ):
             if Registration.objects.all().filter(id=id).exists():
                 messages.info(
-                    request, f"{regObjects.course.title} deleted successfully"
+                    request, f"{regObjects.course_title} deleted successfully"
                 )
                 regObjects = Registration.objects.filter(id=id).delete()
 
