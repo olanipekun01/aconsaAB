@@ -5,6 +5,7 @@ from common.models import CustomUser, SessionBase, SemesterBase, CollegeBase, De
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils.timezone import now
+from django.db import models
 from django.contrib.auth.hashers import make_password, check_password
 from django.contrib.auth.models import AbstractUser
 from django.contrib.auth.models import AbstractUser
@@ -86,7 +87,6 @@ class Student(models.Model):
 
     def __str__(self):
         return f"{self.surname} - {self.matricNumber} (Stream A)"
-    
 
 class Enrollment(models.Model):
     student = models.ForeignKey(Student, on_delete=models.CASCADE)
@@ -144,7 +144,11 @@ class Registration(models.Model):
     )
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     student = models.ForeignKey(Student, on_delete=models.CASCADE,  null=True, default=None)
-    course = models.ForeignKey(Course, on_delete=models.CASCADE,  null=True, default=None)
+    # course = models.ForeignKey(Course, on_delete=models.CASCADE,  null=True, default=None)
+    course_title = models.CharField(max_length=255, null=True, blank=True)
+    courseCode = models.CharField(blank=True, null=True, max_length=15)
+    unit = models.IntegerField(blank=True, null=True)
+    status = models.CharField(blank=True, null=True, max_length=40)
     session = models.ForeignKey(Session, on_delete=models.CASCADE,  null=True, default=None)
     semester = models.ForeignKey(Semester, on_delete=models.CASCADE,  null=True, default=None)
     instructor_remark = models.CharField(max_length=50, choices=INSTRUCTOR_REMARK_CHOICES, null=True, default='pending')

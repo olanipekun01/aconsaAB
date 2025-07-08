@@ -64,9 +64,9 @@ class CourseAdmin(admin.ModelAdmin):
 
 @admin.register(Registration)
 class RegistrationAdmin(admin.ModelAdmin):
-    list_display = ('student', 'course', 'session', 'semester', 'instructor_remark')
+    list_display = ('student', 'courseCode', 'session', 'semester', 'instructor_remark')
     list_filter = ('session', 'instructor_remark')
-    search_fields = ('student__surname', 'student__matricNumber', 'course__courseCode')
+    search_fields = ('student__surname', 'student__matricNumber', 'courseCode')
 
 @admin.register(Result)
 class ResultAdmin(admin.ModelAdmin):

@@ -788,7 +788,7 @@ def ResultFilter(request):
 
                 # Calculate total credit units
                 total_credit_units = sum(
-                    course.registration.course.unit for course in attempts
+                    course.registration.unit for course in attempts
                 )
 
                 # Calculate total points
@@ -876,7 +876,7 @@ def ResultView(request):
 
                 # Calculate total credit units
                 total_credit_units = sum(
-                    course.registration.course.unit for course in attempts
+                    course.registration.unit for course in attempts
                 )
 
                 # Calculate total points
@@ -982,7 +982,8 @@ def AdvisorDashboard(request):
             semester=current_semester_model,
             instructor_remark="rejected",
         )
-
+        
+        deptcourse = get_object_or_404(Course, courseCode=registration__courseCode)
        
 
         pending_students = Student.objects.filter(

@@ -1,0 +1,13 @@
+coursetitle,courseCode,unit,status,category,department,programme,level,semester,perequisitecourse
+Foundation of Nursing/Emergency Care I,NUR 111,2,C,nursing course,Nursing,HND,ND1,first,
+Foundation of Nursing Practicals,NUR 111,2,C,nursing course,Nursing,HND,ND1,first,
+Applied Chemistry,NUS 111,2,C,Non-Nursing course,Nursing,HND,ND1,first,
+Applied Physics,NUS 112,2,C,Non-Nursing course,Nursing,HND,ND1,first,
+Human Anatomy,NUS 113,4,C,life science,Nursing,HND,ND1,first,
+Human Physiology,NUS 114,2,C,life science,Nursing,HND,ND1,first,
+Introduction to Sociology,NUS 115,2,C,non-nursing course,Nursing,HND,ND1,first,
+Use of Computer,NUS 116,2,C,non-nursing course ,Nursing,HND,ND1,first,
+Medical Microbiology,NUS 117,3,C,life science,Nursing,HND,ND1,first,
+Biology,NUS 118,2,C,non-nursing course,Nursing,HND,ND1,first,
+Communication in English,GNS 102,2,C,non-nursing course,Nursing,HND,ND1,first,
+Citizenship Education,GNS 112,2,C,non-nursing course,Nursing,HND,ND1,first,

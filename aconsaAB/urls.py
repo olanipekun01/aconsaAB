@@ -32,7 +32,7 @@ def custom_404_view(request, exception):
 handler404 = custom_404_view
 
 urlpatterns = [
-    path('adminhddgdgdgdgdgdgddg/', admin.site.urls),
+    path('admin/', admin.site.urls),
     path('', include('common.urls')),
     path('stream_a/', include('stream_a.urls')),
     path('stream_b/', include('stream_b.urls')),

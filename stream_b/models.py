@@ -15,10 +15,7 @@ from django.dispatch import receiver
 from django.utils.timezone import now
 import os
 
-
-
-
-
+# Create your models here.
 class Session(SessionBase):
     def __str__(self):
         return f"{self.year} (Stream B)"
@@ -120,13 +117,10 @@ class Course(models.Model):
     programme = models.ManyToManyField(Programme, related_name='courses')
     level = models.ForeignKey(Level, on_delete=models.CASCADE)
     semester = models.ForeignKey(Semester, on_delete=models.CASCADE, null=True)
+    prerequisites = models.ManyToManyField("self", blank=True, symmetrical=False)
 
     def __str__(self):
         return f"{self.courseCode} (Stream B)"
-
-# Add other models (Instructor, LevelAdvisor, Registration, Result, ConfirmRegister) similarly
-
-
 
 
 class LevelAdvisor(models.Model):

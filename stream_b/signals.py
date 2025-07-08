@@ -5,8 +5,10 @@ from django.core.management import call_command
 
 @receiver(pre_save, sender=Session)
 def handle_session_change(sender, instance, **kwargs):
-    if instance.id:  # Existing session
+    if instance.pk is None:  # New Session, no ID in database yet
+        return  # Skip querying
+    try:
         old_session = Session.objects.get(id=instance.id)
-        if old_session.is_current and not instance.is_current:
-            # Session is being marked as non-current
-            call_command('mark_compulsory_carryovers')
+        # Add your logic here, e.g., compare old_session.is_current with instance.is_current
+    except Session.DoesNotExist:
+        pass
