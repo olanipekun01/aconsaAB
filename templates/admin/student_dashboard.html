@@ -432,18 +432,18 @@
                                 </div>
                                 <div class="flex flex-row gap-4 mt-5  border-y-[1px] border-[#000] px-[30px] py-[10px] overflow-x-scroll">
                                     {% for data in sessions_and_levels %}
-                                        {% if  data.level == unique_levels|get_item:i and data.registration.course.semester.name == 'first' %}
+                                        {% if  data.level == unique_levels|get_item:i and data.registration.courseSemester == 'first' %}
                                         <div class="card min-w-[140px] rounded-md border-[0.5px] border-[#077105] px-[5px] py-[10px]">
                                             <div class="flex flex-row justify-between">
-                                                <h5 class="font-bold text-[15px]">{{data.registration.course.courseCode}}</h5>
+                                                <h5 class="font-bold text-[15px]">{{data.registration.courseCode}}</h5>
 
-                                                <span class="text-[#077105] font-bold">{{data.registration.course.status}}</span>
+                                                <span class="text-[#077105] font-bold">{{data.registration.status}}</span>
                                             </div>
-                                            <p class="mt-3 text-[10px]"><span class="text-12px font-bold">Title: </span>{{data.registration.course.title}}</p>
+                                            <p class="mt-3 text-[10px]"><span class="text-12px font-bold">Title: </span>{{data.registration.course_title}}</p>
                                             
                                             <div class="mt-3 flex flex-row justify-between items-center">
                                                 {% if data.result.grade and data.registration.session == curr_sess and data.registration.semester == curr_semes %}
-                                                <button onclick="handleGradeUpdateModal('{{data.registration.id}}', '{{data.registration.course.title}}', '{{data.registration.course.courseCode}}')"><img class="w-[15px]" src="{% static './assets/bx-edit.svg' %}" alt=""></button>
+                                                <button onclick="handleGradeUpdateModal('{{data.registration.id}}', '{{data.registration.course_title}}', '{{data.registration.courseCode}}')"><img class="w-[15px]" src="{% static './assets/bx-edit.svg' %}" alt=""></button>
                                                 {% endif %}
                                                 <div class="flex flex-row gap-3">
                                                     <div class="text-[12px]"><span class="font-bold">Grade:</span> <i class="">{{data.result.grade}}</i></div>
@@ -462,7 +462,7 @@
                                                 {% if data.registration.session == curr_sess and data.registration.semester == curr_semes %}
                                                 <button class="text-red-700" onclick="handleDeletePopOut('/instructor/student/management/reg/delete/{{data.registration.id}}', '{{data.registration.course.title}}')">Delete</button>
                                                 {% endif %}
-                                                <span class="">{{data.registration.course.unit}}</span>
+                                                <span class="">{{data.registration.unit}}</span>
                                                 
                                             </div>
 
@@ -500,18 +500,18 @@
                                 </div>
                                 <div class="flex flex-row gap-4 mt-5  border-y-[1px] border-[#000] px-[30px] py-[10px] overflow-x-scroll">
                                     {% for data in sessions_and_levels %}
-                                        {% if  data.level == unique_levels|get_item:i and data.registration.course.semester.name == 'second' %}
+                                        {% if  data.level == unique_levels|get_item:i and data.registration.courseSemester == 'second' %}
                                         <div class="card min-w-[140px] rounded-md border-[0.5px] border-[#077105] px-[5px] py-[10px]">
                                             <div class="flex flex-row justify-between">
-                                                <h5 class="font-bold text-[15px]">{{data.registration.course.courseCode}}</h5>
+                                                <h5 class="font-bold text-[15px]">{{data.registration.courseCode}}</h5>
 
-                                                <span class="text-[#077105] font-bold">{{data.registration.course.status}}</span>
+                                                <span class="text-[#077105] font-bold">{{data.registration.status}}</span>
                                             </div>
-                                            <p class="mt-3 text-[10px]"><span class="text-12px font-bold">Title: </span>{{data.registration.course.title}}</p>
+                                            <p class="mt-3 text-[10px]"><span class="text-12px font-bold">Title: </span>{{data.registration.course_title}}</p>
                                             
                                             <div class="mt-3 flex flex-row justify-between items-center">
                                                 {% if data.result.grade %}
-                                                <button onclick="handleGradeUpdateModal('{{data.registration.id}}', '{{data.registration.course.title}}', '{{data.registration.course.courseCode}}')"><img class="w-[15px]" src="{% static './assets/bx-edit.svg' %}" alt=""></button>
+                                                <button onclick="handleGradeUpdateModal('{{data.registration.id}}', '{{data.registration.course_title}}', '{{data.registration.courseCode}}')"><img class="w-[15px]" src="{% static './assets/bx-edit.svg' %}" alt=""></button>
                                                 {% endif %}
                                                 <div class="flex flex-row gap-3">
                                                     <div class="text-[12px]"><span class="font-bold">Grade:</span> <i class="">{{data.result.grade}}</i></div>
@@ -529,7 +529,7 @@
                                                 {% if data.registration.session == curr_sess and data.registration.session == curr_semes %}
                                                 <button class="text-red-700" onclick="handleDeletePopOut('/instructor/student/management/reg/delete/{{data.registration.id}}', '{{data.registration.course.title}}')">Delete</button>
                                                 {% endif %}
-                                                <span class="">{{data.registration.course.unit}}</span>
+                                                <span class="">{{data.registration.unit}}</span>
                                             </div>
 
                                             <div class="flex justify-between mt-4 text-[11px] font-bold">

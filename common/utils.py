@@ -74,13 +74,13 @@ def generate_course_pdf(reg_course, student, session, semester, confirmReg):
     pdf.set_text_color(0, 0, 0)
     unit = 0
     for co in reg_course:
-        pdf.cell(25, 4, f"{co.course.courseCode.upper()}", border=1)
-        pdf.cell(100, 4, f"{co.course.title.upper()}", border=1)
-        pdf.cell(15, 4, f"{co.course.unit}", border=1)
-        pdf.cell(30, 4, f"{co.course.status.upper()}", border=1)
+        pdf.cell(25, 4, f"{co.courseCode.upper()}", border=1)
+        pdf.cell(100, 4, f"{co.course_title.upper()}", border=1)
+        pdf.cell(15, 4, f"{co.unit}", border=1)
+        pdf.cell(30, 4, f"{co.status.upper()}", border=1)
         pdf.cell(15, 4, f"", border=1)
         pdf.ln()
-        unit += co.course.unit
+        unit += co.unit
 
     pdf.cell(25, 4, f"", border=1)
     pdf.cell(100, 4, f"Total Registered Units", border=1)
@@ -188,18 +188,18 @@ def generate_pdf(reg_course, student, session, semester, confirmReg, gpa):
     pdf.cell(15, 4, f"Grade", border=1)
     pdf.ln()
     for co in reg_course:
-        if co.registration.course.category == "non-nursing course":
-            pdf.cell(25, 4, f"* {co.registration.course.courseCode.upper()}", border=1)
-        elif co.registration.course.category == "nursing course":
-            pdf.cell(25, 4, f"*** {co.registration.course.courseCode.upper()}", border=1)
+        if co.registration.courseCategory == "non-nursing course":
+            pdf.cell(25, 4, f"* {co.registration.courseCode.upper()}", border=1)
+        elif co.registration.courseCategory == "nursing course":
+            pdf.cell(25, 4, f"*** {co.registration.courseCode.upper()}", border=1)
         else:
-            pdf.cell(25, 4, f"** {co.registration.course.courseCode.upper()}", border=1)
-        pdf.cell(100, 4, f"{co.registration.course.title.upper()}", border=1)
-        pdf.cell(15, 4, f"{co.registration.course.unit}", border=1)
+            pdf.cell(25, 4, f"** {co.registration.courseCode.upper()}", border=1)
+        pdf.cell(100, 4, f"{co.registration.course_title.upper()}", border=1)
+        pdf.cell(15, 4, f"{co.registration.unit}", border=1)
         pdf.cell(15, 4, f"{co.grade}", border=1)
         pdf.cell(15, 4, f"{co.grade_type.upper()}", border=1)
         pdf.ln()
-        unit += co.registration.course.unit
+        unit += co.registration.unit
 
     pdf.cell(25, 4, f"", border=1)
     pdf.cell(100, 4, f"Total Registered Units", border=1)

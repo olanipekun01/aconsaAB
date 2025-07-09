@@ -1358,7 +1358,7 @@ def deleteStudentRegisteredCourse(request, id):
         ):
             if Models.Registration.objects.all().filter(id=id).exists():
                 messages.info(
-                    request, f"{regObjects.course.title} deleted successfully"
+                    request, f"{regObjects.course_title} deleted successfully"
                 )
                 regObjects = Models.Registration.objects.filter(id=id).delete()
 
@@ -1387,11 +1387,12 @@ def addCourseStudentRegisteredCourse(request, matricNo):
 
 
         try:
+            print("got here")
             student = (
                 Models.Student.objects.all()
                 .filter(
                     Q(matricNumber=matricNo) | Q(jambNumber=matricNo),
-                    department='ACONSA Instructor',
+                    department='nursing',
                 )
                 .first()
             )
@@ -1428,18 +1429,25 @@ def addCourseStudentRegisteredCourse(request, matricNo):
                         Models.Registration.objects.all()
                         .filter(
                             student=student,
-                            course=get_object_or_404(Course, id=courseId),
-                            session=get_object_or_404(Session, year=curr_session),
-                            semester=get_object_or_404(Semester, name=curr_semester),
+                            course=get_object_or_404(Models.Course, id=courseId),
+                            session=get_object_or_404(Models.Session, year=curr_session),
+                            semester=get_object_or_404(Models.Semester, name=curr_semester),
                         )
                         .exists()
                     ):
                         messages.info(request, f"Already registered")
                         return redirect("/instructor/student/management/")
 
+                    crs = get_object_or_404(Models.Course, id=courseId)
                     course_exist = Models.Registration.objects.create(
                         student=student,
-                        course=get_object_or_404(Models.Course, id=courseId),
+                        course_title=crs.title,
+                        courseCode=crs.courseCode,
+                        unit=crs.unit,
+                        status=crs.status,
+                        courseSemester=crs.semester.name,
+                        courseLevel=crs.level.name,
+                        courseCategory=crs.category,
                         session=get_object_or_404(Models.Session, year=curr_session),
                         semester=get_object_or_404(Models.Semester, name=curr_semester),
                     )

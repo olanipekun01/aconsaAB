@@ -149,13 +149,16 @@ class Registration(models.Model):
     courseCode = models.CharField(blank=True, null=True, max_length=15)
     unit = models.IntegerField(blank=True, null=True)
     status = models.CharField(blank=True, null=True, max_length=40)
+    courseSemester = models.CharField(blank=True, null=True, max_length=40)
+    courseLevel = models.CharField(blank=True, null=True, max_length=40)
+    courseCategory = models.CharField(blank=True, null=True, max_length=40)
     session = models.ForeignKey(Session, on_delete=models.CASCADE,  null=True, default=None)
     semester = models.ForeignKey(Semester, on_delete=models.CASCADE,  null=True, default=None)
     instructor_remark = models.CharField(max_length=50, choices=INSTRUCTOR_REMARK_CHOICES, null=True, default='pending')
     registration_date = models.DateTimeField(default=now)
 
     def __str__(self):
-        return f"{self.id} - {self.student.surname} - {self.course} ({self.session}, {self.semester})"
+        return f"{self.id} - {self.student.surname} - {self.courseCode} ({self.session}, {self.semester})"
 
 class Result(models.Model):
     GRADE_REMARK_CHOICES = (
@@ -180,12 +183,12 @@ class Result(models.Model):
         unique_together = ('registration', 'attempt_number')  # Prevent duplicate attempts for the same registration
 
     def __str__(self):
-        return f"Result for {self.registration.student.surname} - {self.registration.course} (Attempt {self.attempt_number})"
+        return f"Result for {self.registration.student.surname} - {self.registration.courseCode} (Attempt {self.attempt_number})"
 
     def save(self, *args, **kwargs):
         # Automatically update grade_type based on the grade
         if self.grade is not None:
-            if self.registration.course.category == 'NC' or self.registration.course.category == 'LS':
+            if self.registration.courseCategory == 'NC' or self.registration.courseCategory == 'LS':
                 if self.grade >= 70:
                     self.grade_type = 'A'
                 elif self.grade >= 60:
@@ -207,7 +210,7 @@ class Result(models.Model):
                     self.grade_type = 'F'
 
             # Update grade_remark based on whether the grade is a pass or fail
-            if self.registration.course.category == 'NC' or self.registration.course.category == 'LS':
+            if self.registration.courseCategory == 'NC' or self.registration.courseCategory == 'LS':
                 self.grade_remark = 'passed' if self.grade >= 50 else 'failed'
             else:
                 self.grade_remark = 'passed' if self.grade >= 45 else 'failed'
@@ -224,7 +227,7 @@ class Result(models.Model):
                 self.grade_point = 0
 
         if self.grade_type is not None and self.grade_point is not None:
-            self.total_point = self.grade_point * self.registration.course.unit
+            self.total_point = self.grade_point * self.registration.unit
 
         super().save(*args, **kwargs)
 

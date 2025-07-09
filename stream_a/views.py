@@ -135,6 +135,13 @@ def Courses(request):
         current_session_model = Session.objects.filter(is_current=True).first()
         current_semester_model = Semester.objects.filter(is_current=True).first()
 
+        if not current_session_model:
+            messages.error(request, "No current session is set. Please set one as current.")
+            return redirect("stream_a:courses")
+        if not current_semester_model:
+            messages.error(request, "No current semester is set. Please set one as current.")
+            return redirect("stream_a:courses")
+
         if request.method == "POST":
             courses = request.POST.getlist("courses")
             totalUnit = request.POST["totalUnit"]
@@ -161,6 +168,9 @@ def Courses(request):
                             courseCode=course.courseCode,
                             unit=course.unit,
                             status=course.status,
+                            courseSemester =course.semester.name,
+                            courseLevel=course.level.name,
+                            courseCategory=course.category,
                             session=current_session_model,
                             semester=current_semester_model,
                             defaults={"instructor_remark": "pending"}
@@ -205,6 +215,9 @@ def Courses(request):
                             courseCode=course.courseCode,
                             unit=course.unit,
                             status=course.status,
+                            courseSemester =course.semester.name,
+                            courseLevel=course.level.name,
+                            courseCategory=course.category,
                             session=current_session_model,
                             semester=current_semester_model,
                             instructor_remark="pending"
@@ -234,44 +247,23 @@ def Courses(request):
             return redirect("stream_a:courses")
 
         
-        try:
-            current_semester_model = Semester.objects.get(is_current=True)
-        except ObjectDoesNotExist:
-            # raise ValueError("No current semester is set. Please set one as current.")
-            messages.error(
-                request, "No current semester is set. Please set one as current."
-            )
-            return redirect("stream_a:courses")
-
-        # Get the current session
-        try:
-            current_session_model = Session.objects.get(is_current=True)
-        except ObjectDoesNotExist:
-            messages.error(
-                request, "No current session is set. Please set one as current."
-            )
-            return redirect("stream_a:courses")
-
+        
+        
         courses = Course.objects.filter(
             level=level,
             programme=student.programme,
             semester=current_semester_model,
         )
 
-        # registered_courses = Registration.objects.filter(
-        #     student=student,
-        #     semester=current_semester_model,
-        #     session=current_session_model,  # Ensure this is the current academic session
-        #     instructor_remark__in=["approved", "pending"],
-        # ).values_list("course_id", flat=True)
-
-        registered_courses = Course.objects.filter(
-            title__in=Registration.objects.filter(
-                student=student,
-                semester=current_semester_model,
-                session=current_session_model,
-                instructor_remark__in=["approved", "pending"],
-            ).values("course_title")
+        registered_courses = Registration.objects.filter(
+            student=student,
+            semester=current_semester_model,
+            session=current_session_model,  # Ensure this is the current academic session
+            instructor_remark__in=["approved", "pending"],
+        ).values_list("course_title", flat=True)
+        
+        registered_course_ids = Course.objects.filter(
+            title__in=registered_courses
         ).values_list("id", flat=True)
         
         previously_registered_courses = Registration.objects.filter(
@@ -279,10 +271,10 @@ def Courses(request):
         ).values_list("course_title", flat=True)
 
 
-        courses = courses.exclude(id__in=registered_courses).exclude(
+        courses = courses.exclude(id__in=registered_course_ids).exclude(
             title__in=previously_registered_courses
         )
-
+        
         available_courses = [
             course for course in courses if has_prerequisites_passed(student, course)
         ]
@@ -311,7 +303,7 @@ def Courses(request):
             )
             for attempt in latest_attempts
         ]
-
+        
         failed_results = Result.objects.filter(
             reduce(or_, conditions) if conditions else Q(),
             grade_remark__in=["failed", "pending"]
@@ -328,57 +320,57 @@ def Courses(request):
             session=current_session_model,
             semester=current_semester_model,
             instructor_remark__in=["approved", "pending"]
-        ).values_list("course_id", flat=True)
-
-       
+        ).values_list("course_title", flat=True)
 
         
-
         latest_registrations = registrations.filter(
-            ~Q(course_id__in=courses_in_current_session),
+            ~Q(course_title__in=courses_in_current_session),
             semester=current_semester_model,
             
-        ).values("course_id").annotate(
+        ).values("course_title").annotate(
             latest_registration_id=Subquery(
                 registrations.filter(
-                    ~Q(course_id__in=courses_in_current_session),
-                    course_id=OuterRef("course_id"),
+                    ~Q(course_title__in=courses_in_current_session),
+                    course_title=OuterRef("course_title"),
                     semester=current_semester_model,
                     
                 ).order_by("-registration_date", "-id").values("id")[:1]
             )
-        ).values("course_id", "latest_registration_id")
+        ).values("course_title", "latest_registration_id")
 
         carryover_base_registrations = registrations.filter(
-            ~Q(course_id__in=courses_in_current_session),
+            ~Q(course_title__in=courses_in_current_session),
             semester=current_semester_model,
             
         )
-        courses_with_prereqs_met = [
-            reg.course for reg in carryover_base_registrations
-            if reg.course.prerequisites.count() == 0 or has_prerequisites_passed(student, reg.course)
-        ]
 
-        # Step 4: Filter carryover registrations where latest result is not passed
-        # carryover_registrations = registrations.filter(
-        #     ~Q(course_id__in=courses_in_current_session),
-        #     id__in=Subquery(latest_registrations.values("latest_registration_id")),
-        #     semester=current_semester_model,
-            
-        # ).exclude(
-        #     id__in=Subquery(
-        #         Result.objects.filter(
-        #             registration_id=OuterRef("id"),
-        #             grade_remark="passed"
-        #         ).values("registration_id")
-        #     )
-        # ).distinct()
+        
+        # courses_with_prereqs_met = [
+        #     reg.course for reg in carryover_base_registrations
+        #     if reg.course.prerequisites.count() == 0 or has_prerequisites_passed(student, reg.course)
+        # ]
 
+        # course_title_with_prereqs_met = [
+        #     reg.course for reg in carryover_base_registrations
+        #     if reg.course.prerequisites.count() == 0 or has_prerequisites_passed(student, reg.course)
+        # ]
+
+        course_titles_with_prereqs_met = []
+        for reg in carryover_base_registrations:
+            try:
+                course = Course.objects.get(title=reg.course_title)
+                if course.prerequisites.count() == 0 or has_prerequisites_passed(student, course):
+                    course_titles_with_prereqs_met.append(course.title)
+            except Course.DoesNotExist:
+                print(f"Course title not found: {reg.course_title}")
+                continue
+
+       
         carryover_registrations = registrations.filter(
-            ~Q(course_id__in=courses_in_current_session),
+            ~Q(course_title__in=courses_in_current_session),
             id__in=Subquery(latest_registrations.values("latest_registration_id")),
             semester=current_semester_model,
-            course__in=courses_with_prereqs_met
+            course_title__in=course_titles_with_prereqs_met
         ).exclude(
             id__in=Subquery(
                 Result.objects.filter(
@@ -388,37 +380,55 @@ def Courses(request):
             )
         ).distinct()
 
-       
         
+        
+        compulsory_course_titles = Course.objects.filter(
+            status="C",
+            department=student.department
+        ).values_list("title", flat=True)
 
+        
 
         # Step 6: Compulsory pending carryovers (only if prerequisites are now passed)
         compulsory_carryovers = Registration.objects.filter(
-            ~Q(course_id__in=courses_in_current_session),
+            ~Q(course_title__in=courses_in_current_session),
             student=student,
             session__year__lt=current_session_model.year,
             semester=current_semester_model,
-            course__status="C",
-            course__in=[course for course in Course.objects.all() if has_prerequisites_passed(student, course)],
-            
+            status="C",
+            course_title__in=[course.title for course in Course.objects.all() if has_prerequisites_passed(student, course)],
         )
+        
 
         # Apply latest registration filter to compulsory carryovers
         base_compulsory_carryovers = Registration.objects.filter(
             student=student,
             session__year__lt=current_session_model.year,
             semester=current_semester_model,
-            course__status="C",
+            status="C",
+
         )
 
+        
+
         # Filter courses by prerequisites
-        courses_with_prereqs_met = [
-            reg.course for reg in base_compulsory_carryovers
-            if reg.course.prerequisites.count() == 0 or has_prerequisites_passed(student, reg.course)
-        ]
+        # courses_with_prereqs_met = [
+        #     reg.course for reg in base_compulsory_carryovers
+        #     if reg.course.prerequisites.count() == 0 or has_prerequisites_passed(student, reg.course)
+        # ]
+
+        course_titles_with_prereqs_met = []
+        for reg in base_compulsory_carryovers:
+            try:
+                course = Course.objects.get(title=reg.course_title)
+                if course.prerequisites.count() == 0 or has_prerequisites_passed(student, course):
+                    course_titles_with_prereqs_met.append(course.title)
+            except Course.DoesNotExist:
+                print(f"Course title not found: {reg.course_title}")
+                continue
 
         # Debug: Print courses with prerequisites met
-        print("Courses with Prerequisites Met:", [course.title for course in courses_with_prereqs_met])
+        print("Courses with Prerequisites Met:", [course for course in course_titles_with_prereqs_met])
 
 
         
@@ -426,20 +436,20 @@ def Courses(request):
 
     
         compulsory_carryovers = Registration.objects.filter(
-            ~Q(course_id__in=courses_in_current_session),
+            ~Q(course_title__in=courses_in_current_session),
             id__in=Subquery(
                 base_compulsory_carryovers.filter(
-                    course_id=OuterRef("course_id")
+                    course_title=OuterRef("course_title")
                 ).order_by("-registration_date", "-id").values("id")[:1]
             ),
             student=student,
             session__year__lt=current_session_model.year,
             semester=current_semester_model,
-            course__status="C",
+            status="C",
             instructor_remark="pending",
-            course__in=courses_with_prereqs_met
+            course_title__in=course_titles_with_prereqs_met
         ).distinct()
-
+        print("I got herer ooo2")
 
         # Debug: Print final carryovers
         print("Compulsory Carryovers:", list(compulsory_carryovers))
@@ -454,20 +464,20 @@ def Courses(request):
         combined_carryovers = (carryover_registrations | compulsory_carryovers)
 
         # Debug: Print combined carryovers
-        print("Combined Carryovers:", list(combined_carryovers.values("course__title", "course__courseCode", "session__year", "id")))
+        print("Combined Carryovers:", list(combined_carryovers.values("course_title", "courseCode", "session__year", "id")))
 
         # Get the latest registration per course based on session__year
-        latest_registrations = combined_carryovers.values("course_id").annotate(
+        latest_registrations = combined_carryovers.values("course_title").annotate(
             max_session_year=Max("session__year")
-        ).values("course_id", "max_session_year")
+        ).values("course_title", "max_session_year")
 
         # Debug: Print latest registrations per course
         print("Latest Registrations:", list(latest_registrations))
 
         # Filter to keep only the latest registration per course
         carryover_courses_unique = combined_carryovers.filter(
-            course_id__in=Subquery(
-                latest_registrations.values("course_id")
+            course_title__in=Subquery(
+                latest_registrations.values("course_title")
             ),
             session__year__in=Subquery(
                 latest_registrations.values("max_session_year")
@@ -501,9 +511,6 @@ def Courses(request):
         # carryover_courses_unique = (carryover_registrations | prereq_carryovers).distinct()
         # carryover_courses_unique = (carryover_registrations).distinct()
 
-        
-
-    
 
         registrations = Registration.objects.filter(student=student).select_related(
             "session"
@@ -616,6 +623,8 @@ def printCopy(request):
                 instructor_remark="approved"
             )
 
+            
+
             confirmReg = confirmRegister.objects.filter(
                 student=student,
                 semester=get_object_or_404(Semester, name=semes),
@@ -623,7 +632,7 @@ def printCopy(request):
             ).first()
 
             gen = generate_course_pdf(reg_courses, student, sess, semes, confirmReg)
-
+            
             gen.output("fpdfdemo.pdf", "F")
 
             response = HttpResponse(

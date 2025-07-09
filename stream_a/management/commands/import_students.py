@@ -8,7 +8,7 @@ from django.core.files import File
 # from common.models import CustomUser, Student, Level, College, Department, Programme, Session, Enrollment
 
 from common.models import *
-from stream_b.models import *
+from stream_a.models import *
 
 class Command(BaseCommand):
     help = 'Import students from a CSV file'

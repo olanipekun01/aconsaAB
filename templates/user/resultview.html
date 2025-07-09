@@ -73,15 +73,15 @@
                   <!-- Dynamic Rows -->
                    {% for result in results %}
                    <tr>
-                    {% if result.registration.course.category == "non-nursing course" %}
-                      <td class="border border-gray-300 px-4 py-2">* {{result.registration.course.courseCode}}</td>
-                    {% elif result.registration.course.category == 'nursing course' %}
-                      <td class="border border-gray-300 px-4 py-2">*** {{result.registration.course.courseCode}}</td>
+                    {% if result.registration.courseCategory == "non-nursing course" %}
+                      <td class="border border-gray-300 px-4 py-2">* {{result.registration.courseCode}}</td>
+                    {% elif result.registration.courseCategory == 'nursing course' %}
+                      <td class="border border-gray-300 px-4 py-2">*** {{result.registration.courseCode}}</td>
                     {% else %}
-                      <td class="border border-gray-300 px-4 py-2">** {{result.registration.course.courseCode}}</td>
+                      <td class="border border-gray-300 px-4 py-2">** {{result.registration.courseCode}}</td>
                     {% endif %}
-                    <td class="border border-gray-300 px-4 py-2">{{result.registration.course.title}}</td>
-                    <td class="border border-gray-300 px-4 py-2">{{result.registration.course.unit}}</td>
+                    <td class="border border-gray-300 px-4 py-2">{{result.registration.course_title}}</td>
+                    <td class="border border-gray-300 px-4 py-2">{{result.registration.unit}}</td>
                     <td class="border border-gray-300 px-4 py-2">{{result.grade_type}}</td>
                     <td class="border border-gray-300 px-4 py-2">{{result.grade_point}}</td>
                     <td class="border border-gray-300 px-4 py-2">{{result.total_point}}</td>

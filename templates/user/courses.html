@@ -72,10 +72,10 @@
                   {% if carryover %}
                     {% for co in carryover %}
                       <tr>
-                        <td class='tbodytrtd '><input type="hidden" name="courses" value="{{ co.course.id }}"/><input type="checkbox" checked disabled data-unit="{{co.course.unit}}" name='courses' value="{{course.id}}" class="course-checkbox"/></td>
-                        <td class="border border-gray-200 p-2">{{co.course.courseCode}}</td>
-                        <td class="border border-gray-200 p-2">{{co.course.title}}</td>
-                        <td class="border border-gray-200 p-2">{{co.course.unit}}</td>
+                        <td class='tbodytrtd '><input type="hidden" name="courses" value="{{ co.course_title }}"/><input type="checkbox" checked disabled data-unit="{{co.unit}}" name='courses' value="{{course.id}}" class="course-checkbox"/></td>
+                        <td class="border border-gray-200 p-2">{{co.courseCode}}</td>
+                        <td class="border border-gray-200 p-2">{{co.course_title}}</td>
+                        <td class="border border-gray-200 p-2">{{co.unit}}</td>
                         <td class="border border-gray-200 p-2">{{semes}} Semester</td>
                         <td class="border border-gray-200 p-2">C</td>
                         <td class="border-b p-2 text-left"></td>
@@ -176,10 +176,10 @@
             <tbody>
                 {% for reg in carryover %}
                     <tr>
-                        <td class="border-b p-2">{{ reg.course.courseCode }}</td>
-                        <td class="border-b p-2">{{ reg.course.title }}</td>
-                        <td class="border-b p-2">{{ reg.course.level.name }}</td>
-                        <td class="border-b p-2">{{ reg.course.unit }}</td>
+                        <td class="border-b p-2">{{ reg.courseCode }}</td>
+                        <td class="border-b p-2">{{ reg.course_title }}</td>
+                        <td class="border-b p-2">{{ reg.courseLevel }}</td>
+                        <td class="border-b p-2">{{ reg.unit }}</td>
                         <td class="border-b p-2">{{ reg.course.is_compulsory|yesno:"Yes,No" }}</td>
                         <td class="border-b p-2">
                             {% if reg.id in failed_registration_ids %}
@@ -240,13 +240,13 @@
             <tbody id="table-body">
               <!-- Dynamic rows will be inserted here -->
               {% for data in sessions_and_levels %}
-                  {% if  data.level == unique_levels|get_item:i and data.registration.course.semester.name == 'first' %}
+                  {% if  data.level == unique_levels|get_item:i and data.registration.courseSemester == 'first' %}
                   <tr>
-                    <td class="border p-2 text-left">{{data.registration.course.courseCode}}</td>
-                    <td class="border p-2 text-left">{{data.registration.course.title}}</td>
-                    <td class="border p-2 text-left">{{data.registration.course.unit}}</td>
-                    <td class="border p-2 text-left">{{data.registration.course.semester.name}}</td>
-                    <td class="border p-2 text-left">{{data.registration.course.status}}</td>
+                    <td class="border p-2 text-left">{{data.registration.courseCode}}</td>
+                    <td class="border p-2 text-left">{{data.registration.course_title}}</td>
+                    <td class="border p-2 text-left">{{data.registration.unit}}</td>
+                    <td class="border p-2 text-left">{{data.registration.courseSemester}}</td>
+                    <td class="border p-2 text-left">{{data.registration.status}}</td>
                     <td class="border p-2 text-left">{{data.registration.instructor_remark}}</td>
                     {% if data.registration.instructor_remark == 'rejected' %}
                     <td class="border p-2 text-left"><a href="{% url 'stream_'|add:stream|add:':course_delete' data.registration.id %}" class="text-red-700 underline">del</a></td>
